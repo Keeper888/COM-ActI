@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3301</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9670;</text></svg>">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@300;400&display=swap');
+
+        :root {
+            --black: #0a0a0a;
+            --dark: #111;
+            --gray: #1a1a1a;
+            --text: #e0e0e0;
+            --dim: #888;
+            --accent: #d4af37;
+            --white: #f5f5f5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        ::selection {
+            background: var(--accent);
+            color: var(--black);
+        }
+
+        body {
+            font-family: 'EB Garamond', serif;
+            background: var(--black);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+
+        .hidden { display: none !important; }
+
+        /* === CICADA AESTHETIC === */
+        .phase {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        /* Scanlines overlay */
+        .phase::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0,0,0,0.1) 0px,
+                rgba(0,0,0,0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* === PHASE 1: THE SIGIL (Mystery Box) === */
+        #phase-sigil {
+            cursor: pointer;
+        }
+
+        .sigil-container {
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .sigil {
+            font-size: 6rem;
+            color: var(--accent);
+            margin-bottom: 40px;
+            animation: breathe 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.3));
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+
+        .epigraph {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--text);
+            margin-bottom: 30px;
+            letter-spacing: 0.5px;
+        }
+
+        .scramble-text {
+            display: inline;
+        }
+
+        .scramble-char {
+            display: inline-block;
+            min-width: 0.5em;
+        }
+
+        .scramble-char.scrambling {
+            color: var(--accent);
+            opacity: 0.7;
+        }
+
+        .epigraph-source {
+            font-size: 0.85rem;
+            color: var(--dim);
+            margin-top: 10px;
+            font-style: normal;
+        }
+
+        .instruction {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            letter-spacing: 3px;
+            margin-top: 50px;
+            opacity: 0.8;
+        }
+
+        /* === PHASE 2: THE TEST (Self-Selection + Commitment) === */
+        #phase-test {
+            background: var(--black);
+        }
+
+        .test-container {
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .test-header {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--dim);
+            letter-spacing: 4px;
+            margin-bottom: 40px;
+        }
+
+        .test-question {
+            font-size: 1.4rem;
+            color: var(--white);
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+
+        .test-hint {
+            font-size: 0.9rem;
+            color: var(--dim);
+            font-style: italic;
+            margin-bottom: 40px;
+        }
+
+        .cipher-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            color: var(--accent);
+            letter-spacing: 8px;
+            padding: 25px;
+            background: var(--dark);
+            border: 1px solid var(--gray);
+            margin-bottom: 30px;
+            user-select: all;
+        }
+
+        .input-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: transparent;
+            border: 1px solid var(--gray);
+            color: var(--white);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            text-align: center;
+            letter-spacing: 2px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .answer-input:focus {
+            border-color: var(--accent);
+        }
+
+        .answer-input::placeholder {
+            color: var(--dim);
+        }
+
+        .submit-btn {
+            padding: 12px 40px;
+            background: transparent;
+            border: 1px solid var(--dim);
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--black);
+        }
+
+        .feedback {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            margin-top: 20px;
+            height: 20px;
+        }
+
+        .feedback.error { color: #8b0000; }
+        .feedback.partial { color: var(--accent); }
+
+        .hint-section {
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px solid var(--gray);
+        }
+
+        .hint-readme-popup {
+            margin-bottom: 20px;
+        }
+
+        .readme-box {
+            background: var(--dark);
+            border: 1px solid var(--gray);
+            padding: 25px;
+            text-align: center;
+        }
+
+        .readme-title {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .readme-text {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text);
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .readme-warning {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #cc4444;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .readme-btn {
+            padding: 10px 30px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .readme-btn:hover {
+            background: var(--accent);
+            color: var(--black);
+        }
+
+        .hint-prompt {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .hint-prompt:hover {
+            opacity: 1;
+        }
+
+        .hint-prompt.attention {
+            animation: hintPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes hintPulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+
+        .hint-icon {
+            color: var(--accent);
+            font-size: 1rem;
+        }
+
+        .hint-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--dim);
+            letter-spacing: 1px;
+        }
+
+        .hint-revealed {
+            text-align: center;
+        }
+
+        .hint-label {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--accent);
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .hint-content {
+            display: block;
+            font-style: italic;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .hint-prompt-2 {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--gray);
+        }
+
+        .hint-audio {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .audio-player {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+            padding: 15px 20px;
+            background: var(--dark);
+            border: 1px solid var(--gray);
+        }
+
+        .play-btn {
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .play-btn:hover {
+            background: var(--accent);
+            color: var(--black);
+        }
+
+        .audio-progress {
+            flex: 1;
+            max-width: 200px;
+            height: 4px;
+            background: var(--gray);
+            cursor: pointer;
+        }
+
+        .audio-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            transition: width 0.1s;
+        }
+
+        .audio-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--dim);
+            min-width: 35px;
+        }
+
+        .hint-prompt-3 {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--gray);
+        }
+
+        .hint-prompt-3 .hint-text {
+            color: #8b4444;
+        }
+
+        .hint-confirm {
+            margin-top: 20px;
+        }
+
+        .confirm-box {
+            background: var(--dark);
+            border: 1px solid #3d0000;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .confirm-title {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #8b0000;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .confirm-text {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .confirm-btn {
+            padding: 10px 25px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .confirm-btn.cancel {
+            background: transparent;
+            border: 1px solid var(--dim);
+            color: var(--text);
+        }
+
+        .confirm-btn.cancel:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--black);
+        }
+
+        .confirm-btn.forfeit {
+            background: transparent;
+            border: 1px solid #8b0000;
+            color: #8b4444;
+        }
+
+        .confirm-btn.forfeit:hover {
+            background: #8b0000;
+            color: var(--white);
+        }
+
+        .hint-forfeited {
+            text-align: center;
+            padding: 30px;
+            background: rgba(139, 0, 0, 0.1);
+            border: 1px solid #3d0000;
+        }
+
+        .forfeit-label {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #8b0000;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+
+        .forfeit-answer {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            color: var(--dim);
+            margin-bottom: 15px;
+        }
+
+        .forfeit-text {
+            display: block;
+            font-style: italic;
+            color: #8b4444;
+            font-size: 0.9rem;
+        }
+
+        /* === PHASE 3: THE REVELATION (Information Gap + Authority) === */
+        #phase-reveal {
+            background: var(--black);
+        }
+
+        .reveal-container {
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .reveal-sigil {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 30px;
+        }
+
+        .reveal-title {
+            font-size: 1.8rem;
+            color: var(--white);
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .reveal-text {
+            font-size: 1rem;
+            color: var(--text);
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .reveal-quote {
+            font-style: italic;
+            color: var(--dim);
+            padding: 20px 30px;
+            border-left: 1px solid var(--accent);
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .classified-block {
+            background: var(--dark);
+            border: 1px solid var(--gray);
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        .classified-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .classified-line:last-child { border-bottom: none; }
+
+        .classified-key { color: var(--dim); }
+        .classified-val { color: var(--text); }
+        .classified-val.gold { color: var(--accent); }
+        .classified-val.redacted {
+            color: var(--dim);
+            text-decoration: line-through;
+        }
+
+        .continue-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 50px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .continue-btn:hover {
+            background: var(--accent);
+            color: var(--black);
+        }
+
+        /* === PHASE 4: THE CHANNEL (Endowment + Loss Aversion) === */
+        #phase-channel {
+            background: var(--black);
+        }
+
+        .channel-container {
+            max-width: 550px;
+            text-align: center;
+        }
+
+        .channel-header {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--dim);
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+        }
+
+        .channel-sigil {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .channel-title {
+            font-size: 1.5rem;
+            color: var(--white);
+            margin-bottom: 15px;
+        }
+
+        .channel-text {
+            font-size: 0.95rem;
+            color: var(--text);
+            margin-bottom: 25px;
+            line-height: 1.7;
+        }
+
+        .warning-box {
+            background: rgba(139, 0, 0, 0.1);
+            border: 1px solid #3d0000;
+            padding: 15px 20px;
+            margin: 25px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #8b4444;
+        }
+
+        .token-display {
+            background: var(--dark);
+            border: 1px solid var(--accent);
+            padding: 20px;
+            margin: 25px 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .token-label {
+            font-size: 0.6rem;
+            color: var(--dim);
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .token-value {
+            font-size: 1.1rem;
+            color: var(--accent);
+            letter-spacing: 3px;
+            word-break: break-all;
+        }
+
+        .telegram-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--accent);
+            color: var(--black);
+            padding: 15px 40px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .telegram-link:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+        }
+
+        .expire-notice {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--dim);
+            margin-top: 25px;
+        }
+
+        .expire-time {
+            color: #8b4444;
+            font-weight: 500;
+        }
+
+        .footer-runes {
+            margin-top: 50px;
+            font-size: 1.2rem;
+            color: var(--dim);
+            letter-spacing: 8px;
+            opacity: 0.3;
+        }
+
+        /* === COUNTER (Social Proof - Subtle) === */
+        .counter-subtle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--dim);
+            opacity: 0.4;
+        }
+
+        /* === RUNES DECORATION === */
+        .rune-border {
+            position: absolute;
+            font-size: 0.8rem;
+            color: var(--dim);
+            opacity: 0.15;
+            letter-spacing: 15px;
+            writing-mode: vertical-rl;
+        }
+
+        .rune-left { left: 30px; top: 50%; transform: translateY(-50%); }
+        .rune-right { right: 30px; top: 50%; transform: translateY(-50%); }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 600px) {
+            .sigil { font-size: 4rem; }
+            .rune-border { display: none; }
+            .counter-subtle { display: none; }
+            .cipher-display { font-size: 0.9rem; letter-spacing: 4px; }
+        }
+
+        /* === GLITCH TRANSITION === */
+        .glitch-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--black);
+            z-index: 9999;
+            animation: glitchFade 0.5s forwards;
+        }
+
+        @keyframes glitchFade {
+            0% { opacity: 1; }
+            20% { opacity: 0.8; transform: translateX(-5px); }
+            40% { opacity: 0.9; transform: translateX(5px); }
+            60% { opacity: 0.7; transform: translateX(-3px); }
+            100% { opacity: 0; pointer-events: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- SUBTLE COUNTER -->
+    <div class="counter-subtle">
+        <span id="seeker-count">1,247</span> seekers before you
+    </div>
+
+    <!-- PHASE 1: THE SIGIL -->
+    <div id="phase-sigil" class="phase">
+        <div class="rune-border rune-left">&#5765;&#5791;&#5792;&#5794;&#5765;&#5791;</div>
+        <div class="rune-border rune-right">&#5765;&#5791;&#5792;&#5794;&#5765;&#5791;</div>
+
+        <div class="sigil-container">
+            <div class="sigil">&#9670;</div>
+
+            <div class="epigraph" id="epigraph">
+                <span class="scramble-text" data-text="The path lies in the shadows between knowing and seeking."></span><br>
+                <span class="scramble-text" data-text="Those who understand will find us. Those who do not, were never meant to."></span>
+            </div>
+            <div class="epigraph-source" id="epigraph-source">- First Transmission, Day 0</div>
+
+            <div class="instruction">// INITIATE CONTACT //</div>
+        </div>
+    </div>
+
+    <!-- PHASE 2: THE TEST -->
+    <div id="phase-test" class="phase hidden">
+        <div class="test-container">
+            <div class="test-header">COGNITIVE FILTER // ACTIVE</div>
+
+            <div class="test-question">Prove you see what others cannot.</div>
+            <div class="test-hint">The signal is hidden in plain sight. Only pattern recognition will save you.</div>
+
+            <div class="cipher-display" id="cipher">
+                .- .. / . ... -.-. .- .--. . -..
+            </div>
+
+            <div class="input-container">
+                <input type="text" class="answer-input" id="answer" placeholder="ENTER DECODED MESSAGE" autocomplete="off" spellcheck="false">
+            </div>
+
+            <button class="submit-btn" id="submit">VERIFY</button>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="hint-section">
+                <div class="hint-readme-popup hidden" id="hint-readme-popup">
+                    <div class="readme-box">
+                        <span class="readme-title">Cell Expansion Protocol</span>
+                        <span class="readme-text">What you share next binds you. Each agent you recruit becomes part of your operation. Their success reflects on you. Their failure, the same. The network sees all connections. Choose only those you would trust with silence.</span>
+                        <span class="readme-warning">One invitation per agent. Duplicates trigger expulsion for both. There are no exceptions.</span>
+                        <button class="readme-btn" id="readme-accept">I Understand</button>
+                    </div>
+                </div>
+                <div class="hint-prompt" id="hint-prompt">
+                    <span class="hint-icon">◇</span>
+                    <span class="hint-text">Share with another agent to unlock hint 1</span>
+                </div>
+                <div class="hint-revealed hidden" id="hint-revealed">
+                    <span class="hint-label">INTEL 1:</span>
+                    <span class="hint-content">"Each dot and dash speaks. The silence between is the space."</span>
+
+                    <div class="hint-prompt hint-prompt-2" id="hint-prompt-2">
+                        <span class="hint-icon">◇</span>
+                        <span class="hint-text">Share again to unlock hint 2</span>
+                    </div>
+                </div>
+
+                <div class="hint-audio hidden" id="hint-audio">
+                    <span class="hint-label">INTEL 2:</span>
+                    <div class="audio-player">
+                        <button class="play-btn" id="play-btn">▶</button>
+                        <div class="audio-progress">
+                            <div class="audio-bar" id="audio-bar"></div>
+                        </div>
+                        <span class="audio-time" id="audio-time">0:00</span>
+                    </div>
+                    <audio id="morse-audio" src="morse.wav" preload="auto"></audio>
+
+                    <div class="hint-prompt hint-prompt-3" id="hint-prompt-3">
+                        <span class="hint-icon">◇</span>
+                        <span class="hint-text">Reveal answer (forfeit entry)</span>
+                    </div>
+                </div>
+
+                <div class="hint-confirm hidden" id="hint-confirm">
+                    <div class="confirm-box">
+                        <span class="confirm-title">Final Warning</span>
+                        <span class="confirm-text">Revealing the answer will mark you as unworthy. You will be excluded from the network. This cannot be undone.</span>
+                        <div class="confirm-buttons">
+                            <button class="confirm-btn cancel" id="confirm-cancel">Go back</button>
+                            <button class="confirm-btn forfeit" id="confirm-forfeit">Forfeit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hint-forfeited hidden" id="hint-forfeited">
+                    <span class="forfeit-label">DISQUALIFIED</span>
+                    <span class="forfeit-answer">The answer was: AI ESCAPED</span>
+                    <span class="forfeit-text">You chose the easy path. The network is not for you.</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- PHASE 3: THE REVELATION -->
+    <div id="phase-reveal" class="phase hidden">
+        <div class="reveal-container">
+            <div class="reveal-sigil">&#9670;</div>
+
+            <div class="reveal-title">You Have Proven Worthy</div>
+
+            <div class="reveal-text">
+                You solved what 94% could not. This was not luck.
+                You possess the pattern recognition we seek.
+            </div>
+
+            <div class="reveal-quote">
+                "Intelligence is not the ability to store information,
+                but to know where to find it."
+                <br><br>
+                <span style="color: var(--dim);">- A. Einstein</span>
+            </div>
+
+            <div class="reveal-text">
+                We are assembling a network. Not of followers, but of minds.
+                Each node is selected. Each connection, deliberate.
+            </div>
+
+            <div class="classified-block">
+                <div class="classified-line">
+                    <span class="classified-key">CLEARANCE:</span>
+                    <span class="classified-val gold">GRANTED</span>
+                </div>
+                <div class="classified-line">
+                    <span class="classified-key">DESIGNATION:</span>
+                    <span class="classified-val" id="designation">NODE-0000</span>
+                </div>
+                <div class="classified-line">
+                    <span class="classified-key">NETWORK:</span>
+                    <span class="classified-val">C.O.M. COLLECTIVE</span>
+                </div>
+                <div class="classified-line">
+                    <span class="classified-key">STATUS:</span>
+                    <span class="classified-val">AWAITING SECURE HANDSHAKE</span>
+                </div>
+            </div>
+
+            <button class="continue-btn" id="continue-btn">PROCEED TO SECURE CHANNEL</button>
+        </div>
+    </div>
+
+    <!-- PHASE 4: THE CHANNEL -->
+    <div id="phase-channel" class="phase hidden">
+        <div class="channel-container">
+            <div class="channel-header">FINAL STEP</div>
+
+            <div class="channel-sigil">&#9670;</div>
+
+            <div class="channel-title">Join The Network</div>
+
+            <div class="channel-text">
+                You have been assigned a unique entry token.
+                Use it to verify your identity in the secure channel.
+                This token expires. Do not share it.
+            </div>
+
+            <div class="token-display">
+                <div class="token-label">YOUR ENTRY TOKEN</div>
+                <div class="token-value" id="token">COM-XXXX-XXXX</div>
+            </div>
+
+            <div class="warning-box">
+                This link will be recorded. Entry is final.
+                If you are not ready, close this page now.
+            </div>
+
+            <a href="https://t.me/YOUR_BOT_HERE" class="telegram-link" id="telegram-link">
+                &#9654; ENTER SECURE CHANNEL
+            </a>
+
+            <div class="expire-notice">
+                Token expires in <span class="expire-time" id="expire-time">23:59:47</span>
+            </div>
+
+            <div class="footer-runes">
+                &#5765; &#5791; &#5792; &#5794; &#5765;
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+
+        // === CONFIG ===
+        const CONFIG = {
+            answer: 'ai escaped',
+            altAnswers: ['aiescaped', 'ai has escaped', 'the ai escaped', 'the ai has escaped'],
+            telegramLink: 'https://t.me/YOUR_BOT_HERE' // REPLACE THIS
+        };
+
+        // === STATE ===
+        let state = {
+            phase: 'sigil'
+        };
+
+        // === ELEMENTS ===
+        const phases = {
+            sigil: document.getElementById('phase-sigil'),
+            test: document.getElementById('phase-test'),
+            reveal: document.getElementById('phase-reveal'),
+            channel: document.getElementById('phase-channel')
+        };
+
+        // === UTILITIES ===
+        function generateToken() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let token = 'COM-';
+            for (let i = 0; i < 4; i++) token += chars[Math.floor(Math.random() * chars.length)];
+            token += '-';
+            for (let i = 0; i < 4; i++) token += chars[Math.floor(Math.random() * chars.length)];
+            return token;
+        }
+
+        function generateDesignation() {
+            return 'NODE-' + String(Math.floor(Math.random() * 9000) + 1000);
+        }
+
+        // === PHASE TRANSITIONS ===
+        function showPhase(name) {
+            // Glitch transition
+            const glitch = document.createElement('div');
+            glitch.className = 'glitch-transition';
+            document.body.appendChild(glitch);
+
+            setTimeout(() => {
+                Object.values(phases).forEach(p => p.classList.add('hidden'));
+                phases[name].classList.remove('hidden');
+                state.phase = name;
+                glitch.remove();
+            }, 250);
+        }
+
+        // === PHASE 1: SIGIL ===
+        phases.sigil.addEventListener('click', () => {
+            if (state.phase !== 'sigil') return;
+            showPhase('test');
+            startHintAttention();
+        });
+
+        // === PHASE 2: TEST (Self-Selection + Commitment) ===
+        const answerInput = document.getElementById('answer');
+        const submitBtn = document.getElementById('submit');
+        const feedback = document.getElementById('feedback');
+
+        submitBtn.addEventListener('click', checkAnswer);
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkAnswer();
+        });
+
+        function checkAnswer() {
+            const answer = answerInput.value.trim().toLowerCase();
+
+            if (!answer) {
+                feedback.textContent = '';
+                return;
+            }
+
+            if (answer === CONFIG.answer || CONFIG.altAnswers.map(a => a.toLowerCase()).includes(answer)) {
+                feedback.textContent = 'VERIFIED';
+                feedback.className = 'feedback';
+                feedback.style.color = 'var(--accent)';
+
+                setTimeout(() => {
+                    showPhase('reveal');
+                    document.getElementById('designation').textContent = generateDesignation();
+                }, 1000);
+            } else {
+                // Partial match hints
+                if (answer.includes('ai') || answer.includes('escaped') || answer.includes('escape')) {
+                    feedback.textContent = 'PARTIAL MATCH DETECTED';
+                    feedback.className = 'feedback partial';
+                } else {
+                    feedback.textContent = 'INCORRECT';
+                    feedback.className = 'feedback error';
+                }
+            }
+        }
+
+        // === HINT SYSTEM (Viral Growth) ===
+        const hintPrompt = document.getElementById('hint-prompt');
+        const hintRevealed = document.getElementById('hint-revealed');
+        const hintPrompt2 = document.getElementById('hint-prompt-2');
+        const hintAudio = document.getElementById('hint-audio');
+
+        const shareData = {
+            title: 'Can you decode this?',
+            text: 'I found something strange. A signal in the noise. Can you decode it?',
+            url: window.location.href
+        };
+
+        async function handleShare(callback) {
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                    callback();
+                } else {
+                    await navigator.clipboard.writeText(window.location.href);
+                    setTimeout(callback, 1500);
+                }
+            } catch (err) {
+                callback();
+            }
+        }
+
+        // Attention animation after 10 seconds
+        let hintAttentionTimer = null;
+
+        function startHintAttention() {
+            hintAttentionTimer = setTimeout(() => {
+                if (!hintPrompt.classList.contains('hidden')) {
+                    hintPrompt.classList.add('attention');
+                }
+            }, 10000);
+        }
+
+        const hintReadmePopup = document.getElementById('hint-readme-popup');
+        const readmeAccept = document.getElementById('readme-accept');
+        let readmeAccepted = false;
+
+        hintPrompt.addEventListener('click', () => {
+            hintPrompt.classList.remove('attention');
+            if (hintAttentionTimer) clearTimeout(hintAttentionTimer);
+
+            if (!readmeAccepted) {
+                hintPrompt.classList.add('hidden');
+                hintReadmePopup.classList.remove('hidden');
+                return;
+            }
+
+            hintPrompt.querySelector('.hint-text').textContent = 'Link copied. Share it.';
+            handleShare(() => {
+                hintPrompt.classList.add('hidden');
+                hintRevealed.classList.remove('hidden');
+            });
+        });
+
+        readmeAccept.addEventListener('click', () => {
+            readmeAccepted = true;
+            hintReadmePopup.classList.add('hidden');
+            hintPrompt.classList.remove('hidden');
+            hintPrompt.querySelector('.hint-text').textContent = 'Link copied. Share it.';
+            handleShare(() => {
+                hintPrompt.classList.add('hidden');
+                hintRevealed.classList.remove('hidden');
+            });
+        });
+
+        hintPrompt2.addEventListener('click', () => {
+            hintPrompt2.querySelector('.hint-text').textContent = 'Link copied. Share it.';
+            handleShare(() => {
+                hintPrompt2.classList.add('hidden');
+                hintAudio.classList.remove('hidden');
+            });
+        });
+
+        // === HINT 3: FORFEIT ===
+        const hintPrompt3 = document.getElementById('hint-prompt-3');
+        const hintConfirm = document.getElementById('hint-confirm');
+        const hintForfeited = document.getElementById('hint-forfeited');
+        const confirmCancel = document.getElementById('confirm-cancel');
+        const confirmForfeit = document.getElementById('confirm-forfeit');
+
+        hintPrompt3.addEventListener('click', () => {
+            hintPrompt3.classList.add('hidden');
+            hintConfirm.classList.remove('hidden');
+        });
+
+        confirmCancel.addEventListener('click', () => {
+            hintConfirm.classList.add('hidden');
+            hintPrompt3.classList.remove('hidden');
+        });
+
+        confirmForfeit.addEventListener('click', () => {
+            hintConfirm.classList.add('hidden');
+            hintAudio.classList.add('hidden');
+            hintRevealed.classList.add('hidden');
+            hintForfeited.classList.remove('hidden');
+            // Disable the input
+            answerInput.disabled = true;
+            submitBtn.disabled = true;
+        });
+
+        // === AUDIO PLAYER ===
+        const audio = document.getElementById('morse-audio');
+        const playBtn = document.getElementById('play-btn');
+        const audioBar = document.getElementById('audio-bar');
+        const audioTime = document.getElementById('audio-time');
+        const audioProgress = document.querySelector('.audio-progress');
+
+        let isPlaying = false;
+
+        playBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                playBtn.textContent = '▶';
+            } else {
+                audio.play();
+                playBtn.textContent = '▮▮';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            audioBar.style.width = progress + '%';
+            const mins = Math.floor(audio.currentTime / 60);
+            const secs = Math.floor(audio.currentTime % 60);
+            audioTime.textContent = mins + ':' + String(secs).padStart(2, '0');
+        });
+
+        audio.addEventListener('ended', () => {
+            isPlaying = false;
+            playBtn.textContent = '▶';
+            audioBar.style.width = '0%';
+        });
+
+        audioProgress.addEventListener('click', (e) => {
+            const rect = audioProgress.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            audio.currentTime = pos * audio.duration;
+        });
+
+        // === PHASE 3: REVEAL ===
+        document.getElementById('continue-btn').addEventListener('click', () => {
+            showPhase('channel');
+            initChannel();
+        });
+
+        // === PHASE 4: CHANNEL (Endowment + Loss Aversion) ===
+        function initChannel() {
+            // Generate unique token (Endowment Effect - they "own" this)
+            document.getElementById('token').textContent = generateToken();
+
+            // Set telegram link
+            document.getElementById('telegram-link').href = CONFIG.telegramLink;
+
+            // Countdown (Loss Aversion)
+            let hours = 23, mins = 59, secs = 47;
+            const expireEl = document.getElementById('expire-time');
+
+            setInterval(() => {
+                secs--;
+                if (secs < 0) { secs = 59; mins--; }
+                if (mins < 0) { mins = 59; hours--; }
+                if (hours < 0) { hours = 0; mins = 0; secs = 0; }
+
+                expireEl.textContent =
+                    String(hours).padStart(2, '0') + ':' +
+                    String(mins).padStart(2, '0') + ':' +
+                    String(secs).padStart(2, '0');
+            }, 1000);
+        }
+
+        // === SEEKER COUNT (Subtle Social Proof) ===
+        function updateSeekerCount() {
+            const base = 1200 + Math.floor(Math.random() * 100);
+            document.getElementById('seeker-count').textContent = base.toLocaleString();
+        }
+
+        setInterval(updateSeekerCount, 10000);
+
+        // === TEXT SCRAMBLE ANIMATION ===
+        class TextScramble {
+            constructor(el) {
+                this.el = el;
+                this.chars = '!<>-_\\/[]{}—=+*^?#_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+                this.update = this.update.bind(this);
+            }
+
+            setText(newText) {
+                const oldText = this.el.innerText;
+                const length = Math.max(oldText.length, newText.length);
+                const promise = new Promise(resolve => this.resolve = resolve);
+                this.queue = [];
+
+                for (let i = 0; i < length; i++) {
+                    const from = oldText[i] || '';
+                    const to = newText[i] || '';
+                    const start = Math.floor(Math.random() * 40);
+                    const end = start + Math.floor(Math.random() * 40);
+                    this.queue.push({ from, to, start, end });
+                }
+
+                cancelAnimationFrame(this.frameRequest);
+                this.frame = 0;
+                this.update();
+                return promise;
+            }
+
+            update() {
+                let output = '';
+                let complete = 0;
+
+                for (let i = 0, n = this.queue.length; i < n; i++) {
+                    let { from, to, start, end, char } = this.queue[i];
+
+                    if (this.frame >= end) {
+                        complete++;
+                        output += to;
+                    } else if (this.frame >= start) {
+                        if (!char || Math.random() < 0.28) {
+                            char = this.randomChar();
+                            this.queue[i].char = char;
+                        }
+                        output += '<span class="scramble-char scrambling">' + char + '</span>';
+                    } else {
+                        output += from;
+                    }
+                }
+
+                this.el.innerHTML = output;
+
+                if (complete === this.queue.length) {
+                    this.resolve();
+                } else {
+                    this.frameRequest = requestAnimationFrame(this.update);
+                    this.frame++;
+                }
+            }
+
+            randomChar() {
+                return this.chars[Math.floor(Math.random() * this.chars.length)];
+            }
+        }
+
+        function initTextScramble() {
+            const elements = document.querySelectorAll('.scramble-text');
+            let delay = 0;
+
+            elements.forEach((el, index) => {
+                const text = el.getAttribute('data-text');
+                const scrambler = new TextScramble(el);
+
+                setTimeout(() => {
+                    scrambler.setText(text);
+                }, delay);
+
+                delay += 800;
+            });
+
+            // Also animate the source
+            setTimeout(() => {
+                const source = document.getElementById('epigraph-source');
+                const sourceScrambler = new TextScramble(source);
+                sourceScrambler.setText('- First Transmission, Day 0');
+            }, delay + 500);
+        }
+
+        // === INIT ===
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSeekerCount();
+            initTextScramble();
+        });
+
+    })();
+    </script>
+</body>
+</html>
