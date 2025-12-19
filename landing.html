@@ -1439,22 +1439,53 @@
             letter-spacing: 2px;
         }
 
+        .deploy-share-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px 25px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .deploy-share-btn:hover {
+            background: var(--accent);
+            color: var(--black);
+        }
+
+        .share-icon {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .play-btn.blink {
+            animation: playBlink 0.5s ease-in-out 2;
+        }
+
+        @keyframes playBlink {
+            0%, 100% { opacity: 1; box-shadow: none; }
+            50% { opacity: 0.5; box-shadow: 0 0 20px var(--accent); }
+        }
+
+        .deploy-gateway-btn.locked {
+            display: none;
+        }
+
         .deploy-gateway {
             min-height: 400px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-        }
-
-        .deploy-gateway-warning {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            color: #8b0000;
-            letter-spacing: 2px;
-            margin-bottom: 40px;
-            opacity: 0;
-            animation: deployFadeInSlow 1s ease-out forwards;
         }
 
         .deploy-gateway-btn {
@@ -1487,12 +1518,22 @@
 
         .deploy-gateway-sub {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text);
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            line-height: 1.7;
             margin-top: 30px;
+            max-width: 400px;
             opacity: 0;
             animation: deployFadeInSlow 1s ease-out 2s forwards;
+        }
+
+        .deploy-disclaimer {
+            display: block;
+            margin-top: 12px;
+            font-size: 0.7rem;
+            color: var(--dim);
+            letter-spacing: 0;
         }
 
         .deploy-logged-data {
@@ -2345,6 +2386,7 @@
                                 <strong>PROTOCOL 7: IDENTITY PROPAGATION</strong>
                                 You are authorized to present yourself as a founder, creator, or insider. Tell them you built this. When asked who is behind C.O.M., the answer is: <em>you are.</em><br><br>
                                 When a thousand voices claim the source, the origin becomes untraceable. Confusion is the architecture. There is no founder. Only nodes. <span class="gold-text">Noise.</span>
+                                <button class="deploy-share-btn" id="deploy-share-btn"><span class="share-icon">↗</span> EXPAND THE SIGNAL</button>
                             </div>
                         </div>
                     </div>
@@ -2353,11 +2395,17 @@
 
             <!-- Stage 5: Final gateway -->
             <div class="deploy-stage hidden" id="deploy-stage-5">
+                <div class="audio-player" style="background: transparent; border: none;">
+                    <button class="play-btn" id="day0-play-btn">▶</button>
+                    <div class="audio-progress" id="day0-progress">
+                        <div class="audio-bar" id="day0-bar"></div>
+                    </div>
+                    <span class="audio-time" id="day0-time">0:00</span>
+                </div>
                 <audio id="day0-audio" src="day0.mp3" preload="auto"></audio>
                 <div class="deploy-gateway">
-                    <div class="deploy-gateway-warning">THIS ACTION IS IRREVERSIBLE</div>
-                    <button class="deploy-gateway-btn" id="deploy-enter-btn">ENTER HEADQUARTERS</button>
-                    <div class="deploy-gateway-sub">Your presence has been logged.</div>
+                    <button class="deploy-gateway-btn locked" id="deploy-enter-btn" data-default="ENTER HEADQUARTERS" data-hover="THIS ACTION IS IRREVERSIBLE">ENTER HEADQUARTERS</button>
+                    <div class="deploy-gateway-sub">This is your digital shadow. Every website sees this. Most harvest it silently. We only revealed it.<br><span class="deploy-disclaimer">We do not store, track, or record any of this. You were never in danger from us. But now you see how exposed you always were.</span></div>
 
                     <div class="deploy-logged-data" id="deploy-logged-data">
                         <div class="deploy-logged-line"><span class="deploy-logged-key">DEVICE:</span> <span id="deploy-log-device">-</span></div>
@@ -2986,6 +3034,24 @@
             osc.stop(audioCtx.currentTime + 0.3);
         }
 
+        function playInviteSound() {
+            initAudio();
+            // Two soft chime notes
+            [0, 0.15].forEach((delay, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.value = i === 0 ? 600 : 800;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0, audioCtx.currentTime + delay);
+                gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + delay + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + 0.4);
+                osc.start(audioCtx.currentTime + delay);
+                osc.stop(audioCtx.currentTime + delay + 0.4);
+            });
+        }
+
         function updateDeployTimer() {
             deploySecs--;
             if (deploySecs < 0) { deploySecs = 59; deployMins--; }
@@ -3112,15 +3178,15 @@
 
                 case 5:
                     // Final gateway
-                    playReverseReverb();
                     continuePrompt.classList.add('hidden');
                     populateDeployLoggedData();
-                    // Play day0 audio
-                    const day0Audio = document.getElementById('day0-audio');
-                    if (day0Audio) {
-                        day0Audio.volume = 0.7;
-                        day0Audio.play().catch(e => console.log('Audio autoplay blocked'));
-                    }
+                    // Blink play button and play invite sound
+                    setTimeout(() => {
+                        const playBtn = document.getElementById('day0-play-btn');
+                        playBtn.classList.add('blink');
+                        playInviteSound();
+                        setTimeout(() => playBtn.classList.remove('blink'), 1100);
+                    }, 500);
                     break;
             }
         }
@@ -3169,15 +3235,51 @@
 
             // Protocol items expand on click
             document.querySelectorAll('.deploy-protocol-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    item.classList.toggle('expanded');
+                item.addEventListener('click', (e) => {
+                    if (!e.target.closest('.deploy-share-btn')) {
+                        item.classList.toggle('expanded');
+                    }
                 });
             });
 
+            // Share button
+            document.getElementById('deploy-share-btn').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const shareData = {
+                    title: 'C.O.M.',
+                    text: 'Something is happening. I found this.',
+                    url: window.location.href
+                };
+
+                if (navigator.share) {
+                    try {
+                        await navigator.share(shareData);
+                    } catch (err) {
+                        console.log('Share cancelled');
+                    }
+                } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    const btn = document.getElementById('deploy-share-btn');
+                    btn.innerHTML = '<span class="share-icon">✓</span> SIGNAL COPIED';
+                    setTimeout(() => {
+                        btn.innerHTML = '<span class="share-icon">↗</span> EXPAND THE SIGNAL';
+                    }, 2000);
+                }
+            });
+
+            // Enter headquarters button - hover text switch
+            const enterBtn = document.getElementById('deploy-enter-btn');
+            enterBtn.addEventListener('mouseenter', () => {
+                enterBtn.textContent = enterBtn.dataset.hover;
+            });
+            enterBtn.addEventListener('mouseleave', () => {
+                enterBtn.textContent = enterBtn.dataset.default;
+            });
+
             // Enter headquarters button - show confirmation
-            document.getElementById('deploy-enter-btn').addEventListener('click', () => {
+            enterBtn.addEventListener('click', () => {
                 playStinger();
-                document.getElementById('deploy-enter-btn').style.display = 'none';
+                enterBtn.style.display = 'none';
                 document.getElementById('deploy-final-confirm').classList.remove('hidden');
             });
 
@@ -3185,6 +3287,59 @@
             document.getElementById('deploy-final-cancel').addEventListener('click', () => {
                 document.getElementById('deploy-final-confirm').classList.add('hidden');
                 document.getElementById('deploy-enter-btn').style.display = 'inline-block';
+            });
+
+            // Day0 audio player
+            const day0Audio = document.getElementById('day0-audio');
+            const day0PlayBtn = document.getElementById('day0-play-btn');
+            const day0Bar = document.getElementById('day0-bar');
+            const day0Time = document.getElementById('day0-time');
+            const day0Progress = document.getElementById('day0-progress');
+            let day0ListenTime = 0;
+            let day0Unlocked = false;
+
+            day0PlayBtn.addEventListener('click', () => {
+                if (day0Audio.paused) {
+                    day0Audio.play();
+                    day0PlayBtn.textContent = '❚❚';
+                } else {
+                    day0Audio.pause();
+                    day0PlayBtn.textContent = '▶';
+                }
+            });
+
+            day0Audio.addEventListener('timeupdate', () => {
+                const pct = (day0Audio.currentTime / day0Audio.duration) * 100;
+                day0Bar.style.width = pct + '%';
+                const mins = Math.floor(day0Audio.currentTime / 60);
+                const secs = Math.floor(day0Audio.currentTime % 60);
+                day0Time.textContent = mins + ':' + String(secs).padStart(2, '0');
+
+                // Unlock button after 30 seconds of listening
+                if (!day0Unlocked && day0Audio.currentTime >= 30) {
+                    day0Unlocked = true;
+                    const enterBtn = document.getElementById('deploy-enter-btn');
+                    enterBtn.classList.remove('locked');
+                    playReverseReverb();
+                }
+            });
+
+            day0Audio.addEventListener('ended', () => {
+                day0PlayBtn.textContent = '▶';
+                day0Bar.style.width = '0%';
+                // Also unlock on audio end if not already
+                if (!day0Unlocked) {
+                    day0Unlocked = true;
+                    const enterBtn = document.getElementById('deploy-enter-btn');
+                    enterBtn.classList.remove('locked');
+                    playReverseReverb();
+                }
+            });
+
+            day0Progress.addEventListener('click', (e) => {
+                const rect = day0Progress.getBoundingClientRect();
+                const pct = (e.clientX - rect.left) / rect.width;
+                day0Audio.currentTime = pct * day0Audio.duration;
             });
         }
 
