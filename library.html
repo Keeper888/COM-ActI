@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C.O.M. // SENSORY LIBRARY</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9670;</text></svg>">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@300;400&display=swap');
+
+        :root {
+            --black: #0a0a0a;
+            --dark: #111;
+            --gray: #1a1a1a;
+            --text: #e0e0e0;
+            --dim: #888;
+            --accent: #d4af37;
+            --white: #f5f5f5;
+            --red: #8b0000;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'EB Garamond', serif;
+            background: var(--black);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 40px;
+        }
+
+        h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent);
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            letter-spacing: 3px;
+            margin: 50px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--dim);
+            letter-spacing: 2px;
+            margin: 30px 0 15px;
+        }
+
+        .subtitle {
+            color: var(--dim);
+            font-size: 1rem;
+            margin-bottom: 40px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .demo-box {
+            background: var(--dark);
+            border: 1px solid var(--gray);
+            padding: 30px;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .demo-box:hover {
+            border-color: var(--accent);
+        }
+
+        .demo-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--dim);
+            margin-top: 15px;
+            letter-spacing: 1px;
+        }
+
+        .code-hint {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.55rem;
+            color: var(--accent);
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+
+        /* ========================================
+           50 MICRO ANIMATIONS
+           Psychology: Attention, Trust, Urgency,
+           Reward, Mystery, Social Proof
+           ======================================== */
+
+        /* === 1-10: ATTENTION GRABBERS === */
+
+        /* 1. Subtle Pulse - draws eye without alarm */
+        .anim-pulse {
+            animation: subtlePulse 2s ease-in-out infinite;
+        }
+        @keyframes subtlePulse {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+
+        /* 2. Breathe - mimics human breathing, creates calm focus */
+        .anim-breathe {
+            animation: breathe 4s ease-in-out infinite;
+        }
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* 3. Soft Glow - peripheral vision attractor */
+        .anim-glow {
+            animation: softGlow 3s ease-in-out infinite;
+        }
+        @keyframes softGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
+        }
+
+        /* 4. Text Shimmer - luxury/premium feel */
+        .anim-shimmer {
+            background: linear-gradient(90deg, var(--text) 0%, var(--accent) 50%, var(--text) 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* 5. Fade Reveal - curiosity trigger */
+        .anim-fade-reveal {
+            animation: fadeReveal 2s ease-out forwards;
+        }
+        @keyframes fadeReveal {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 6. Typewriter Cursor - active/live feel */
+        .anim-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1em;
+            background: var(--accent);
+            animation: cursorBlink 0.8s infinite;
+        }
+        @keyframes cursorBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* 7. Subtle Shake - error/attention without aggression */
+        .anim-shake {
+            animation: subtleShake 0.5s ease-in-out;
+        }
+        @keyframes subtleShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            75% { transform: translateX(3px); }
+        }
+
+        /* 8. Float - dreamlike, subconscious appeal */
+        .anim-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* 9. Rotate Slow - hypnotic, meditative */
+        .anim-rotate-slow {
+            animation: rotateSlow 20s linear infinite;
+        }
+        @keyframes rotateSlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 10. Border Trace - draws attention to container */
+        .anim-border-trace {
+            position: relative;
+            overflow: hidden;
+        }
+        .anim-border-trace::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            animation: borderTrace 3s linear infinite;
+        }
+        @keyframes borderTrace {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* === 11-20: TRUST & AUTHORITY === */
+
+        /* 11. Solid Fade In - stable, trustworthy */
+        .anim-solid-fade {
+            animation: solidFade 0.8s ease-out forwards;
+        }
+        @keyframes solidFade {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* 12. Scale Up Confident - assertive entrance */
+        .anim-scale-confident {
+            animation: scaleConfident 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes scaleConfident {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* 13. Underline Draw - emphasis, certainty */
+        .anim-underline {
+            position: relative;
+            display: inline-block;
+        }
+        .anim-underline::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 0;
+            width: 0; height: 1px;
+            background: var(--accent);
+            animation: drawUnderline 1s ease-out forwards;
+        }
+        @keyframes drawUnderline {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+
+        /* 14. Counter Increment - social proof */
+        .anim-counter {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* 15. Checkmark Draw - completion, verification */
+        .anim-checkmark {
+            stroke-dasharray: 50;
+            stroke-dashoffset: 50;
+            animation: drawCheck 0.5s ease-out forwards;
+        }
+        @keyframes drawCheck {
+            100% { stroke-dashoffset: 0; }
+        }
+
+        /* 16. Badge Shine - achievement/status */
+        .anim-badge-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .anim-badge-shine::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: badgeShine 4s ease-in-out infinite;
+        }
+        @keyframes badgeShine {
+            0%, 100% { left: -100%; }
+            50% { left: 150%; }
+        }
+
+        /* 17. Lock Unlock - security visualization */
+        .anim-unlock {
+            animation: unlock 0.6s ease-out forwards;
+        }
+        @keyframes unlock {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(-5px) rotate(-10deg); }
+        }
+
+        /* 18. Stamp - official/approved feel */
+        .anim-stamp {
+            animation: stamp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes stamp {
+            0% { transform: scale(2) rotate(-10deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        /* 19. Verified Pulse - authenticity signal */
+        .anim-verified {
+            animation: verifiedPulse 2s ease-in-out infinite;
+        }
+        @keyframes verifiedPulse {
+            0%, 100% { filter: drop-shadow(0 0 2px var(--accent)); }
+            50% { filter: drop-shadow(0 0 8px var(--accent)); }
+        }
+
+        /* 20. Slide In From Left - established, methodical */
+        .anim-slide-left {
+            animation: slideLeft 0.6s ease-out forwards;
+        }
+        @keyframes slideLeft {
+            0% { transform: translateX(-30px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        /* === 21-30: URGENCY & SCARCITY === */
+
+        /* 21. Timer Tick - countdown pressure */
+        .anim-tick {
+            animation: tick 1s steps(1) infinite;
+        }
+        @keyframes tick {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.7; }
+        }
+
+        /* 22. Rapid Pulse - urgency without panic */
+        .anim-rapid-pulse {
+            animation: rapidPulse 0.5s ease-in-out infinite;
+        }
+        @keyframes rapidPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        /* 23. Color Shift Warning - subtle alert */
+        .anim-color-warn {
+            animation: colorWarn 2s ease-in-out infinite;
+        }
+        @keyframes colorWarn {
+            0%, 100% { color: var(--text); }
+            50% { color: var(--accent); }
+        }
+
+        /* 24. Progress Deplete - loss aversion trigger */
+        .anim-deplete {
+            animation: deplete 10s linear forwards;
+        }
+        @keyframes deplete {
+            0% { width: 100%; background: var(--accent); }
+            70% { background: var(--accent); }
+            100% { width: 0%; background: var(--red); }
+        }
+
+        /* 25. Fade Out Slow - disappearing opportunity */
+        .anim-fade-out {
+            animation: fadeOutSlow 5s ease-in forwards;
+        }
+        @keyframes fadeOutSlow {
+            0% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        /* 26. Slot Decrement - scarcity counter */
+        .anim-decrement {
+            animation: decrement 0.3s ease-out;
+        }
+        @keyframes decrement {
+            0% { transform: translateY(-100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        /* 27. Border Urgent - attention frame */
+        .anim-border-urgent {
+            animation: borderUrgent 1s ease-in-out infinite;
+        }
+        @keyframes borderUrgent {
+            0%, 100% { border-color: var(--gray); }
+            50% { border-color: var(--accent); }
+        }
+
+        /* 28. Shrink Away - loss visualization */
+        .anim-shrink {
+            animation: shrinkAway 3s ease-in forwards;
+        }
+        @keyframes shrinkAway {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.5; }
+        }
+
+        /* 29. Flash Subtle - notification without alarm */
+        .anim-flash-subtle {
+            animation: flashSubtle 0.3s ease-out;
+        }
+        @keyframes flashSubtle {
+            0% { background: rgba(212, 175, 55, 0.2); }
+            100% { background: transparent; }
+        }
+
+        /* 30. Heartbeat - biological urgency */
+        .anim-heartbeat {
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            14% { transform: scale(1.1); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.1); }
+            70% { transform: scale(1); }
+        }
+
+        /* === 31-40: REWARD & DOPAMINE === */
+
+        /* 31. Confetti Burst - celebration micro */
+        .anim-confetti {
+            position: relative;
+        }
+        .anim-confetti::before, .anim-confetti::after {
+            content: '✦';
+            position: absolute;
+            font-size: 0.8rem;
+            animation: confettiBurst 0.6s ease-out forwards;
+        }
+        .anim-confetti::before { left: -10px; animation-delay: 0s; }
+        .anim-confetti::after { right: -10px; animation-delay: 0.1s; }
+        @keyframes confettiBurst {
+            0% { transform: translateY(0) scale(0); opacity: 1; }
+            100% { transform: translateY(-20px) scale(1); opacity: 0; }
+        }
+
+        /* 32. Success Glow - positive reinforcement */
+        .anim-success-glow {
+            animation: successGlow 0.5s ease-out forwards;
+        }
+        @keyframes successGlow {
+            0% { box-shadow: 0 0 0 rgba(212, 175, 55, 0); }
+            50% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.5); }
+            100% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+        }
+
+        /* 33. Number Pop - score/achievement */
+        .anim-number-pop {
+            animation: numberPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes numberPop {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* 34. Progress Fill - completion satisfaction */
+        .anim-progress-fill {
+            animation: progressFill 1s ease-out forwards;
+        }
+        @keyframes progressFill {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* 35. Star Spin - achievement unlock */
+        .anim-star-spin {
+            animation: starSpin 0.6s ease-out forwards;
+        }
+        @keyframes starSpin {
+            0% { transform: rotate(-180deg) scale(0); opacity: 0; }
+            100% { transform: rotate(0deg) scale(1); opacity: 1; }
+        }
+
+        /* 36. Bounce In - playful reward */
+        .anim-bounce-in {
+            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        /* 37. Ripple Out - impact visualization */
+        .anim-ripple {
+            position: relative;
+        }
+        .anim-ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 10px; height: 10px;
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: rippleOut 1s ease-out forwards;
+        }
+        @keyframes rippleOut {
+            0% { width: 10px; height: 10px; opacity: 1; }
+            100% { width: 100px; height: 100px; opacity: 0; }
+        }
+
+        /* 38. Unlock Reveal - hidden content exposed */
+        .anim-unlock-reveal {
+            animation: unlockReveal 0.8s ease-out forwards;
+        }
+        @keyframes unlockReveal {
+            0% { clip-path: inset(0 100% 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        /* 39. Level Up - progression signal */
+        .anim-level-up {
+            animation: levelUp 0.5s ease-out forwards;
+        }
+        @keyframes levelUp {
+            0% { transform: translateY(20px); opacity: 0; filter: blur(5px); }
+            100% { transform: translateY(0); opacity: 1; filter: blur(0); }
+        }
+
+        /* 40. Golden Flash - premium reward */
+        .anim-golden-flash {
+            animation: goldenFlash 0.5s ease-out;
+        }
+        @keyframes goldenFlash {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.5) saturate(1.5); }
+            100% { filter: brightness(1); }
+        }
+
+        /* === 41-50: MYSTERY & INTRIGUE === */
+
+        /* 41. Glitch Text - digital mystery */
+        .anim-glitch {
+            animation: glitch 2s infinite;
+        }
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); filter: none; }
+            92% { transform: translate(-2px, 1px); filter: hue-rotate(90deg); }
+            94% { transform: translate(2px, -1px); filter: hue-rotate(-90deg); }
+            96% { transform: translate(-1px, 2px); }
+            98% { transform: translate(1px, -2px); }
+        }
+
+        /* 42. Static Noise - transmission feel */
+        .anim-static {
+            position: relative;
+            overflow: hidden;
+        }
+        .anim-static::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)' opacity='0.1'/%3E%3C/svg%3E");
+            pointer-events: none;
+            animation: staticNoise 0.1s steps(5) infinite;
+        }
+        @keyframes staticNoise {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(5px, 5px); }
+        }
+
+        /* 43. Redact Reveal - classified feel */
+        .anim-redact {
+            background: linear-gradient(90deg, var(--black) 50%, transparent 50%);
+            background-size: 200% 100%;
+            animation: redactReveal 1s ease-out forwards;
+        }
+        @keyframes redactReveal {
+            0% { background-position: 0% 0; }
+            100% { background-position: -100% 0; }
+        }
+
+        /* 44. Morse Blink - coded message */
+        .anim-morse {
+            animation: morseBlink 2s infinite;
+        }
+        @keyframes morseBlink {
+            0%, 10%, 30%, 40%, 60%, 100% { opacity: 0.3; }
+            5%, 35%, 50%, 55% { opacity: 1; }
+        }
+
+        /* 45. Shadow Creep - ominous presence */
+        .anim-shadow-creep {
+            animation: shadowCreep 4s ease-in-out infinite;
+        }
+        @keyframes shadowCreep {
+            0%, 100% { box-shadow: 5px 5px 20px rgba(0,0,0,0.3); }
+            50% { box-shadow: 15px 15px 40px rgba(0,0,0,0.5); }
+        }
+
+        /* 46. Flicker - unstable transmission */
+        .anim-flicker {
+            animation: flicker 3s infinite;
+        }
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            92% { opacity: 1; }
+            93% { opacity: 0.3; }
+            94% { opacity: 1; }
+            96% { opacity: 0.5; }
+            97% { opacity: 1; }
+        }
+
+        /* 47. Scan Line - surveillance aesthetic */
+        .anim-scanline {
+            position: relative;
+            overflow: hidden;
+        }
+        .anim-scanline::after {
+            content: '';
+            position: absolute;
+            top: -100%; left: 0;
+            width: 100%; height: 50%;
+            background: linear-gradient(transparent, rgba(212, 175, 55, 0.05), transparent);
+            animation: scanLine 3s linear infinite;
+        }
+        @keyframes scanLine {
+            0% { top: -50%; }
+            100% { top: 150%; }
+        }
+
+        /* 48. Cipher Rotate - decryption visual */
+        .anim-cipher {
+            display: inline-block;
+            animation: cipherRotate 0.1s steps(1) infinite;
+        }
+        @keyframes cipherRotate {
+            0% { content: 'A'; }
+            10% { content: 'X'; }
+            20% { content: '7'; }
+            30% { content: 'Q'; }
+            40% { content: '3'; }
+            50% { content: 'M'; }
+            60% { content: '9'; }
+            70% { content: 'K'; }
+            80% { content: '1'; }
+            90% { content: 'Z'; }
+        }
+
+        /* 49. Fade Blur - memory/dream state */
+        .anim-fade-blur {
+            animation: fadeBlur 3s ease-in-out infinite;
+        }
+        @keyframes fadeBlur {
+            0%, 100% { filter: blur(0); opacity: 1; }
+            50% { filter: blur(2px); opacity: 0.7; }
+        }
+
+        /* 50. Portal Spin - dimensional gateway */
+        .anim-portal {
+            animation: portalSpin 10s linear infinite;
+        }
+        @keyframes portalSpin {
+            0% { transform: rotate(0deg); filter: hue-rotate(0deg); }
+            100% { transform: rotate(360deg); filter: hue-rotate(360deg); }
+        }
+
+        /* ========================================
+           SENSORY ELEMENTS
+           5 Senses x 10 Each = 50 Total
+           ======================================== */
+
+        .sense-demo {
+            padding: 20px;
+            background: var(--dark);
+            border: 1px solid var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .sense-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--accent);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .sense-desc {
+            font-size: 0.85rem;
+            color: var(--dim);
+            line-height: 1.5;
+        }
+
+        /* Sound player styles */
+        .sound-btn {
+            padding: 8px 20px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .sound-btn:hover {
+            background: var(--accent);
+            color: var(--black);
+        }
+
+    </style>
+</head>
+<body>
+    <h1>SENSORY LIBRARY // C.O.M.</h1>
+    <p class="subtitle">50 micro-animations + 50 sensory triggers for psychological engagement</p>
+
+    <!-- ==================== ANIMATIONS ==================== -->
+
+    <h2>01 // MICRO ANIMATIONS</h2>
+
+    <h3>ATTENTION GRABBERS (1-10)</h3>
+    <div class="grid">
+        <div class="demo-box">
+            <div class="anim-pulse" style="width:40px;height:40px;background:var(--accent);border-radius:50%;"></div>
+            <div class="demo-label">Subtle Pulse</div>
+            <div class="code-hint">.anim-pulse</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-breathe" style="font-size:2rem;color:var(--accent);">◆</div>
+            <div class="demo-label">Breathe</div>
+            <div class="code-hint">.anim-breathe</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-glow" style="padding:15px 25px;border:1px solid var(--accent);">ELEMENT</div>
+            <div class="demo-label">Soft Glow</div>
+            <div class="code-hint">.anim-glow</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-shimmer" style="font-size:1.2rem;">SHIMMER</div>
+            <div class="demo-label">Text Shimmer</div>
+            <div class="code-hint">.anim-shimmer</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-fade-reveal">REVEALED</div>
+            <div class="demo-label">Fade Reveal</div>
+            <div class="code-hint">.anim-fade-reveal</div>
+        </div>
+        <div class="demo-box">
+            <div>TYPING<span class="anim-cursor"></span></div>
+            <div class="demo-label">Cursor Blink</div>
+            <div class="code-hint">.anim-cursor</div>
+        </div>
+        <div class="demo-box" onclick="this.querySelector('.shake-target').classList.remove('anim-shake');void this.offsetWidth;this.querySelector('.shake-target').classList.add('anim-shake');">
+            <div class="shake-target">CLICK ME</div>
+            <div class="demo-label">Subtle Shake</div>
+            <div class="code-hint">.anim-shake</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-float" style="font-size:1.5rem;">↑</div>
+            <div class="demo-label">Float</div>
+            <div class="code-hint">.anim-float</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-rotate-slow" style="font-size:2rem;color:var(--accent);">✦</div>
+            <div class="demo-label">Rotate Slow</div>
+            <div class="code-hint">.anim-rotate-slow</div>
+        </div>
+        <div class="demo-box anim-border-trace">
+            <div>TRACED</div>
+            <div class="demo-label">Border Trace</div>
+            <div class="code-hint">.anim-border-trace</div>
+        </div>
+    </div>
+
+    <h3>TRUST & AUTHORITY (11-20)</h3>
+    <div class="grid">
+        <div class="demo-box">
+            <div class="anim-solid-fade">SOLID</div>
+            <div class="demo-label">Solid Fade</div>
+            <div class="code-hint">.anim-solid-fade</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-scale-confident">CONFIDENT</div>
+            <div class="demo-label">Scale Confident</div>
+            <div class="code-hint">.anim-scale-confident</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-underline">UNDERLINED</div>
+            <div class="demo-label">Underline Draw</div>
+            <div class="code-hint">.anim-underline</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-counter" id="counter-demo">1,247</div>
+            <div class="demo-label">Counter</div>
+            <div class="code-hint">.anim-counter</div>
+        </div>
+        <div class="demo-box">
+            <svg width="30" height="30" viewBox="0 0 30 30">
+                <path class="anim-checkmark" d="M5 15 L12 22 L25 8" fill="none" stroke="#d4af37" stroke-width="2"/>
+            </svg>
+            <div class="demo-label">Checkmark Draw</div>
+            <div class="code-hint">.anim-checkmark</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-badge-shine" style="padding:10px 20px;background:var(--accent);color:var(--black);">VERIFIED</div>
+            <div class="demo-label">Badge Shine</div>
+            <div class="code-hint">.anim-badge-shine</div>
+        </div>
+        <div class="demo-box">
+            <div style="font-size:1.5rem;">🔓</div>
+            <div class="demo-label">Unlock</div>
+            <div class="code-hint">.anim-unlock</div>
+        </div>
+        <div class="demo-box" onclick="this.querySelector('.stamp-target').classList.remove('anim-stamp');void this.offsetWidth;this.querySelector('.stamp-target').classList.add('anim-stamp');">
+            <div class="stamp-target anim-stamp" style="color:var(--accent);font-weight:bold;">APPROVED</div>
+            <div class="demo-label">Stamp</div>
+            <div class="code-hint">.anim-stamp</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-verified" style="font-size:1.5rem;color:var(--accent);">✓</div>
+            <div class="demo-label">Verified Pulse</div>
+            <div class="code-hint">.anim-verified</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-slide-left">SLIDE IN</div>
+            <div class="demo-label">Slide Left</div>
+            <div class="code-hint">.anim-slide-left</div>
+        </div>
+    </div>
+
+    <h3>URGENCY & SCARCITY (21-30)</h3>
+    <div class="grid">
+        <div class="demo-box">
+            <div class="anim-tick" style="font-family:'JetBrains Mono';color:var(--accent);">23:59:47</div>
+            <div class="demo-label">Timer Tick</div>
+            <div class="code-hint">.anim-tick</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-rapid-pulse" style="padding:10px 20px;border:1px solid var(--accent);">URGENT</div>
+            <div class="demo-label">Rapid Pulse</div>
+            <div class="code-hint">.anim-rapid-pulse</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-color-warn">3 SPOTS LEFT</div>
+            <div class="demo-label">Color Warn</div>
+            <div class="code-hint">.anim-color-warn</div>
+        </div>
+        <div class="demo-box">
+            <div style="width:100%;height:4px;background:var(--gray);"><div class="anim-deplete" style="height:100%;"></div></div>
+            <div class="demo-label">Deplete</div>
+            <div class="code-hint">.anim-deplete</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-fade-out">FADING...</div>
+            <div class="demo-label">Fade Out</div>
+            <div class="code-hint">.anim-fade-out</div>
+        </div>
+        <div class="demo-box" onclick="this.querySelector('.dec-target').classList.remove('anim-decrement');void this.offsetWidth;this.querySelector('.dec-target').classList.add('anim-decrement');">
+            <div class="dec-target">7</div>
+            <div class="demo-label">Decrement</div>
+            <div class="code-hint">.anim-decrement</div>
+        </div>
+        <div class="demo-box anim-border-urgent" style="border:2px solid var(--gray);">
+            <div>URGENT</div>
+            <div class="demo-label">Border Urgent</div>
+            <div class="code-hint">.anim-border-urgent</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-shrink">SHRINKING</div>
+            <div class="demo-label">Shrink Away</div>
+            <div class="code-hint">.anim-shrink</div>
+        </div>
+        <div class="demo-box" onclick="this.classList.add('anim-flash-subtle');setTimeout(()=>this.classList.remove('anim-flash-subtle'),300);">
+            <div>CLICK</div>
+            <div class="demo-label">Flash Subtle</div>
+            <div class="code-hint">.anim-flash-subtle</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-heartbeat" style="font-size:1.5rem;color:#8b0000;">♥</div>
+            <div class="demo-label">Heartbeat</div>
+            <div class="code-hint">.anim-heartbeat</div>
+        </div>
+    </div>
+
+    <h3>REWARD & DOPAMINE (31-40)</h3>
+    <div class="grid">
+        <div class="demo-box" onclick="this.querySelector('.conf-target').classList.toggle('anim-confetti');">
+            <div class="conf-target" style="color:var(--accent);">+100</div>
+            <div class="demo-label">Confetti</div>
+            <div class="code-hint">.anim-confetti</div>
+        </div>
+        <div class="demo-box" onclick="this.classList.add('anim-success-glow');setTimeout(()=>this.classList.remove('anim-success-glow'),500);">
+            <div>CLICK</div>
+            <div class="demo-label">Success Glow</div>
+            <div class="code-hint">.anim-success-glow</div>
+        </div>
+        <div class="demo-box" onclick="this.querySelector('.pop-target').classList.remove('anim-number-pop');void this.offsetWidth;this.querySelector('.pop-target').classList.add('anim-number-pop');">
+            <div class="pop-target anim-number-pop" style="font-size:1.5rem;color:var(--accent);">+50</div>
+            <div class="demo-label">Number Pop</div>
+            <div class="code-hint">.anim-number-pop</div>
+        </div>
+        <div class="demo-box">
+            <div style="width:100%;height:4px;background:var(--gray);"><div class="anim-progress-fill" style="height:100%;background:var(--accent);"></div></div>
+            <div class="demo-label">Progress Fill</div>
+            <div class="code-hint">.anim-progress-fill</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-star-spin" style="font-size:1.5rem;color:var(--accent);">★</div>
+            <div class="demo-label">Star Spin</div>
+            <div class="code-hint">.anim-star-spin</div>
+        </div>
+        <div class="demo-box" onclick="this.querySelector('.bounce-target').classList.remove('anim-bounce-in');void this.offsetWidth;this.querySelector('.bounce-target').classList.add('anim-bounce-in');">
+            <div class="bounce-target anim-bounce-in" style="width:30px;height:30px;background:var(--accent);border-radius:50%;"></div>
+            <div class="demo-label">Bounce In</div>
+            <div class="code-hint">.anim-bounce-in</div>
+        </div>
+        <div class="demo-box" onclick="this.querySelector('.ripple-target').classList.toggle('anim-ripple');">
+            <div class="ripple-target" style="width:20px;height:20px;background:var(--accent);border-radius:50%;"></div>
+            <div class="demo-label">Ripple</div>
+            <div class="code-hint">.anim-ripple</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-unlock-reveal">UNLOCKED CONTENT</div>
+            <div class="demo-label">Unlock Reveal</div>
+            <div class="code-hint">.anim-unlock-reveal</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-level-up" style="color:var(--accent);">LEVEL UP!</div>
+            <div class="demo-label">Level Up</div>
+            <div class="code-hint">.anim-level-up</div>
+        </div>
+        <div class="demo-box" onclick="this.querySelector('.golden-target').classList.add('anim-golden-flash');setTimeout(()=>this.querySelector('.golden-target').classList.remove('anim-golden-flash'),500);">
+            <div class="golden-target" style="color:var(--accent);font-size:1.2rem;">◆</div>
+            <div class="demo-label">Golden Flash</div>
+            <div class="code-hint">.anim-golden-flash</div>
+        </div>
+    </div>
+
+    <h3>MYSTERY & INTRIGUE (41-50)</h3>
+    <div class="grid">
+        <div class="demo-box">
+            <div class="anim-glitch">GLITCH</div>
+            <div class="demo-label">Glitch</div>
+            <div class="code-hint">.anim-glitch</div>
+        </div>
+        <div class="demo-box anim-static">
+            <div>STATIC</div>
+            <div class="demo-label">Static Noise</div>
+            <div class="code-hint">.anim-static</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-redact" style="padding:5px;">CLASSIFIED</div>
+            <div class="demo-label">Redact Reveal</div>
+            <div class="code-hint">.anim-redact</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-morse" style="font-size:1.5rem;color:var(--accent);">●</div>
+            <div class="demo-label">Morse Blink</div>
+            <div class="code-hint">.anim-morse</div>
+        </div>
+        <div class="demo-box anim-shadow-creep">
+            <div>SHADOW</div>
+            <div class="demo-label">Shadow Creep</div>
+            <div class="code-hint">.anim-shadow-creep</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-flicker">FLICKER</div>
+            <div class="demo-label">Flicker</div>
+            <div class="code-hint">.anim-flicker</div>
+        </div>
+        <div class="demo-box anim-scanline">
+            <div>SCANNING</div>
+            <div class="demo-label">Scan Line</div>
+            <div class="code-hint">.anim-scanline</div>
+        </div>
+        <div class="demo-box">
+            <div id="cipher-demo" style="font-family:'JetBrains Mono';color:var(--accent);">DECRYPTING</div>
+            <div class="demo-label">Cipher</div>
+            <div class="code-hint">.anim-cipher</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-fade-blur">BLUR</div>
+            <div class="demo-label">Fade Blur</div>
+            <div class="code-hint">.anim-fade-blur</div>
+        </div>
+        <div class="demo-box">
+            <div class="anim-portal" style="font-size:2rem;color:var(--accent);">◎</div>
+            <div class="demo-label">Portal</div>
+            <div class="code-hint">.anim-portal</div>
+        </div>
+    </div>
+
+    <!-- ==================== SENSORY ==================== -->
+
+    <h2>02 // SENSORY TRIGGERS</h2>
+
+    <h3>SIGHT (Visual Cortex Activation)</h3>
+    <div class="sense-demo">
+        <div class="sense-title">1. GOLDEN RATIO COMPOSITION</div>
+        <div class="sense-desc">Place key elements at 1.618 intervals. The brain recognizes this pattern subconsciously as "correct" and beautiful. Creates instant trust.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">2. FOVEAL TARGETING</div>
+        <div class="sense-desc">Central 2° of vision has highest acuity. Place CTAs dead center. Surround with lower contrast elements to draw focus.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">3. PERIPHERAL MOTION</div>
+        <div class="sense-desc">Rods in peripheral vision detect motion. Subtle animations at screen edges trigger attention shift without conscious awareness.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">4. DARK ADAPTATION</div>
+        <div class="sense-desc">Dark backgrounds make pupils dilate. Dilated pupils = attraction state. Users literally become more attracted to your content.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">5. COLOR TEMPERATURE</div>
+        <div class="sense-desc">Gold (#d4af37) activates reward centers. Red increases heart rate. Blue builds trust. Use gold for CTAs, dark for authority.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">6. Z-PATTERN READING</div>
+        <div class="sense-desc">Western eyes scan Z-pattern. Place logo top-left, hook top-right, content middle, CTA bottom-right.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">7. GESTALT CLOSURE</div>
+        <div class="sense-desc">Incomplete shapes force brain to "complete" them. Use broken circles, partial text. Engagement through mental participation.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">8. NEGATIVE SPACE</div>
+        <div class="sense-desc">Empty space signals luxury and exclusivity. Crowded = cheap. Sparse = elite. Let your content breathe.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">9. TYPOGRAPHIC HIERARCHY</div>
+        <div class="sense-desc">Size contrast creates visual rhythm. 3 sizes max: headline (display), body (readable), accent (small/mono). Consistency = trust.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">10. MICRO-CONTRAST</div>
+        <div class="sense-desc">Subtle borders and shadows create depth without clutter. 1px lines, 5% opacity shadows. Professional, not flashy.</div>
+    </div>
+
+    <h3>SOUND (Auditory Processing)</h3>
+    <div class="sense-demo">
+        <div class="sense-title">1. BINAURAL UNDERTONES</div>
+        <div class="sense-desc">40Hz gamma waves enhance focus. Subtle background frequency creates heightened attention state without conscious awareness.</div>
+        <button class="sound-btn" onclick="playTone(40, 2)">PLAY 40Hz</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">2. UI CLICK SOUNDS</div>
+        <div class="sense-desc">Short, crisp clicks (5-10ms) create tactile feedback. Frequency 1000-2000Hz. Signals successful action, dopamine micro-hit.</div>
+        <button class="sound-btn" onclick="playClick()">PLAY CLICK</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">3. SUCCESS CHIME</div>
+        <div class="sense-desc">Rising pitch = positive. C-E-G chord progression. 300ms duration. Triggers reward pathway like video game level-up.</div>
+        <button class="sound-btn" onclick="playSuccess()">PLAY SUCCESS</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">4. ERROR TONE</div>
+        <div class="sense-desc">Descending minor second (E-Eb). 200ms. Creates discomfort without alarm. User wants to "fix" the error to stop the sound.</div>
+        <button class="sound-btn" onclick="playError()">PLAY ERROR</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">5. AMBIENT DRONE</div>
+        <div class="sense-desc">Low frequency (80-120Hz) continuous tone. Creates tension, immersion. Think movie score suspense. Volume barely perceptible.</div>
+        <button class="sound-btn" onclick="playDrone()">PLAY DRONE</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">6. NOTIFICATION PING</div>
+        <div class="sense-desc">Sharp attack, quick decay. 800Hz. Mimics phone notification = conditioned response. User immediately attends.</div>
+        <button class="sound-btn" onclick="playPing()">PLAY PING</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">7. COUNTDOWN TICK</div>
+        <div class="sense-desc">1-second interval clicks, increasing tempo near zero. Heart rate synchronizes. Creates biological urgency.</div>
+        <button class="sound-btn" onclick="playCountdown()">PLAY COUNTDOWN</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">8. WHISPER EFFECT</div>
+        <div class="sense-desc">Breathy, ASMR-style audio triggers intimacy response. Use for important reveals. "This is just between us."</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">9. STATIC BURST</div>
+        <div class="sense-desc">White noise burst = transmission/radio feel. Creates mystery, "intercepted" aesthetic. 100-300ms.</div>
+        <button class="sound-btn" onclick="playStatic()">PLAY STATIC</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">10. HEARTBEAT RHYTHM</div>
+        <div class="sense-desc">60-80 BPM low thud. Primal, visceral. Creates tension without explicit threat. Body synchronizes unconsciously.</div>
+        <button class="sound-btn" onclick="playHeartbeat()">PLAY HEARTBEAT</button>
+    </div>
+
+    <h3>DARK/HORROR SOUNDS (Goosebump Triggers)</h3>
+    <div class="sense-demo">
+        <div class="sense-title">11. INFRASOUND DREAD</div>
+        <div class="sense-desc">18Hz - below conscious hearing but felt in chest. Used in horror films. Creates unexplainable dread and unease. Can cause chills.</div>
+        <button class="sound-btn" onclick="playInfrasound()">PLAY INFRASOUND</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">12. TRITONE (DEVIL'S INTERVAL)</div>
+        <div class="sense-desc">The "diabolus in musica" - banned in medieval church music. F to B interval. Creates instinctive discomfort, something is wrong.</div>
+        <button class="sound-btn" onclick="playTritone()">PLAY TRITONE</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">13. PSYCHO STRINGS</div>
+        <div class="sense-desc">High-pitched dissonant cluster. Mimics Hitchcock's shower scene. Activates fight-or-flight. Hair stands on end.</div>
+        <button class="sound-btn" onclick="playPsychoStrings()">PLAY STRINGS</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">14. CREEPING DRONE</div>
+        <div class="sense-desc">Slowly rising pitch with subtle wobble. Something is approaching. Used in every horror build-up. Unbearable tension.</div>
+        <button class="sound-btn" onclick="playCreepingDrone()">PLAY DRONE</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">15. REVERSE REVERB</div>
+        <div class="sense-desc">Sound that builds INTO an attack instead of decaying away. Unnatural. Brain knows something is wrong. Pre-scare tension.</div>
+        <button class="sound-btn" onclick="playReverseReverb()">PLAY REVERSE</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">16. DISSONANT WHISPER</div>
+        <div class="sense-desc">Multiple detuned frequencies creating "voices". Sounds like whispers at edge of hearing. Paranoia trigger.</div>
+        <button class="sound-btn" onclick="playWhisper()">PLAY WHISPER</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">17. METALLIC SCRAPE</div>
+        <div class="sense-desc">Nails on chalkboard frequency (2000-4000Hz). Evolutionary danger signal. Mimics predator claws, breaking bones.</div>
+        <button class="sound-btn" onclick="playMetallicScrape()">PLAY SCRAPE</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">18. BREATHING IN THE DARK</div>
+        <div class="sense-desc">Slow, ragged breathing. Something else is in the room. Primal fear of predator nearby. Immediate alertness.</div>
+        <button class="sound-btn" onclick="playBreathing()">PLAY BREATHING</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">19. THE STINGER</div>
+        <div class="sense-desc">Sudden loud dissonant burst after silence. The jump scare sound. Massive adrenaline spike. Use once for maximum impact.</div>
+        <button class="sound-btn" onclick="playStinger()">PLAY STINGER</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">20. SHEPARD TONE (INFINITE DESCENT)</div>
+        <div class="sense-desc">Auditory illusion of endlessly falling pitch. Used in Dunkirk. Creates perpetual dread, no resolution possible. Anxiety loop.</div>
+        <button class="sound-btn" onclick="playShepardTone()">PLAY SHEPARD</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">21. CHILD'S MUSIC BOX (DETUNED)</div>
+        <div class="sense-desc">Innocent melody played slightly wrong. Corrupted innocence = maximum creep. Slowing down = dying/ghostly.</div>
+        <button class="sound-btn" onclick="playMusicBox()">PLAY MUSIC BOX</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">22. SUBHARMONIC PULSE</div>
+        <div class="sense-desc">25Hz pulse beneath audible tone. Felt in organs. Creates nausea, chest pressure. The "brown note" territory.</div>
+        <button class="sound-btn" onclick="playSubharmonic()">PLAY SUBHARMONIC</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">23. DISTANT THUNDER</div>
+        <div class="sense-desc">Low rumble with no clear source. Something massive is happening far away. Existential dread. Approaching doom.</div>
+        <button class="sound-btn" onclick="playDistantThunder()">PLAY THUNDER</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">24. THE VOID</div>
+        <div class="sense-desc">Sudden complete silence after sound. Absence is scarier than presence. The moment before something happens.</div>
+        <button class="sound-btn" onclick="playVoid()">PLAY VOID</button>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">25. BINAURAL ANXIETY</div>
+        <div class="sense-desc">Beta waves (25-30Hz difference between ears). Induces alert, anxious state. Fight-or-flight preparation. Use headphones.</div>
+        <button class="sound-btn" onclick="playBinauralAnxiety()">PLAY BINAURAL</button>
+    </div>
+
+    <h3>TOUCH (Haptic/Somatosensory)</h3>
+    <div class="sense-demo">
+        <div class="sense-title">1. VIBRATION FEEDBACK (Mobile)</div>
+        <div class="sense-desc">10-50ms vibration on button press. Confirms action physically. Use navigator.vibrate([10]) on click events.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">2. SCROLL RESISTANCE</div>
+        <div class="sense-desc">Subtle CSS scroll-snap creates "weight" to scrolling. Content feels substantial, not disposable. scroll-snap-type: y proximity;</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">3. HOVER ELEVATION</div>
+        <div class="sense-desc">Elements "lift" on hover (translateY + shadow). Simulates physical button depression inverse. Creates tactile illusion.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">4. DRAG INERTIA</div>
+        <div class="sense-desc">Draggable elements continue moving after release. Physics-based easing. Feels like real object manipulation.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">5. TEXTURE PATTERNS</div>
+        <div class="sense-desc">Subtle noise overlays create perceived texture. Brain interprets visual texture as tactile. Matte vs glossy feel.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">6. PRESSURE SENSITIVITY</div>
+        <div class="sense-desc">On supported devices, vary effect intensity based on touch pressure. Deeper press = stronger response. 3D Touch/Force Touch.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">7. EDGE RESISTANCE</div>
+        <div class="sense-desc">Elements can't be dragged past boundaries without "rubber band" resistance. Creates physical world rules.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">8. TEMPERATURE ILLUSION</div>
+        <div class="sense-desc">Warm colors (red/gold) feel "warm". Cool colors (blue) feel "cold". Interface can create thermal perception.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">9. WEIGHT PERCEPTION</div>
+        <div class="sense-desc">Larger elements with shadows feel "heavier". Affects perceived importance. Important = heavy = real.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">10. DOUBLE-TAP CONFIRMATION</div>
+        <div class="sense-desc">Require two taps for important actions. Second tap = physical commitment. Reduces accidental actions, increases intentionality.</div>
+    </div>
+
+    <h3>SMELL (Olfactory Suggestion)</h3>
+    <div class="sense-demo">
+        <div class="sense-title">1. VISUAL SCENT TRIGGERS</div>
+        <div class="sense-desc">Images of coffee, leather, smoke trigger olfactory memory. Show wisps of smoke, steam rising. Brain "smells" the image.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">2. WORD ASSOCIATION</div>
+        <div class="sense-desc">Words like "crisp", "fresh", "musty", "burning" activate smell cortex. Use in copy strategically.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">3. COLOR-SCENT MAPPING</div>
+        <div class="sense-desc">Brown = coffee/earth. Green = fresh/mint. Purple = lavender. Yellow = citrus. Colors trigger associated scents.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">4. TEXTURE-SMELL CONNECTION</div>
+        <div class="sense-desc">Rough textures = organic smells. Smooth = clean/sterile. Grain patterns suggest wood smell.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">5. NOSTALGIC IMAGERY</div>
+        <div class="sense-desc">Old photographs, vintage items trigger memory-associated smells. Grandmother's house, old books, rain on pavement.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">6. FOOD IMAGERY</div>
+        <div class="sense-desc">Even abstract food representation triggers salivation and smell memory. Use sparingly but powerfully.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">7. ENVIRONMENTAL CUES</div>
+        <div class="sense-desc">Forest imagery = pine. Ocean = salt/brine. City = exhaust/rain. Scene-setting activates corresponding smell memory.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">8. RITUAL OBJECTS</div>
+        <div class="sense-desc">Candles, incense, cigars, wine glasses. Objects associated with specific smells trigger olfactory imagination.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">9. DECAY SUGGESTION</div>
+        <div class="sense-desc">Rust, aged paper, oxidation patterns. Suggests age and organic decay smells. Creates gravitas, history.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">10. CHEMICAL/STERILE</div>
+        <div class="sense-desc">Clean lines, white space, laboratory aesthetic. Suggests antiseptic, clinical smell. Trust through cleanliness.</div>
+    </div>
+
+    <h3>TASTE (Gustatory Suggestion)</h3>
+    <div class="sense-demo">
+        <div class="sense-title">1. SALIVATION TRIGGERS</div>
+        <div class="sense-desc">Words: "crisp", "juicy", "sour", "sweet". Even non-food contexts trigger micro-salivation. Engagement through biology.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">2. COLOR-TASTE SYNESTHESIA</div>
+        <div class="sense-desc">Red = sweet/berry. Yellow = sour/citrus. Brown = bitter/coffee. Green = fresh/herbal. Universal associations.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">3. TEXTURE WORDS</div>
+        <div class="sense-desc">"Smooth", "crunchy", "velvety", "sharp". Texture words activate taste memory even in abstract contexts.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">4. TEMPERATURE LANGUAGE</div>
+        <div class="sense-desc">"Cool refreshment", "warm embrace", "icy precision". Temperature words trigger taste-related sensations.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">5. UMAMI SUGGESTION</div>
+        <div class="sense-desc">Words implying depth, richness, satisfaction. "Substantial", "deep", "satisfying". Fifth taste = completeness.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">6. BITTER TRUTH</div>
+        <div class="sense-desc">Associate important/difficult truths with bitter taste words. "Hard to swallow", "bitter pill". Makes message feel real.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">7. SWEET REWARD</div>
+        <div class="sense-desc">Rewards described with sweet language. "Sweet victory", "taste of success". Dopamine pathway activation.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">8. METALLIC EDGE</div>
+        <div class="sense-desc">Technical/dangerous content with metallic taste words. "Iron will", "steely resolve", "blood and metal".</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">9. EFFERVESCENCE</div>
+        <div class="sense-desc">"Sparkling", "fizzing", "bubbling". Creates sense of energy, liveliness. Champagne = celebration.</div>
+    </div>
+    <div class="sense-demo">
+        <div class="sense-title">10. AFTERTASTE METAPHOR</div>
+        <div class="sense-desc">"Lingering", "stays with you", "leaves its mark". Creates sense of lasting impact. Memory formation cue.</div>
+    </div>
+
+    <h2>03 // IMPLEMENTATION NOTES</h2>
+    <div class="sense-demo">
+        <div class="sense-title">USAGE IN LANDING.HTML</div>
+        <div class="sense-desc">
+            1. Copy desired animation CSS to landing.html &lt;style&gt; section<br><br>
+            2. Add class to element: &lt;div class="anim-pulse"&gt;<br><br>
+            3. For sounds, copy the JavaScript audio functions<br><br>
+            4. Combine multiple senses for maximum impact (visual + sound + haptic)<br><br>
+            5. Less is more - max 2-3 animations per screen<br><br>
+            6. Use sparingly at key moments: CTAs, reveals, confirmations
+        </div>
+    </div>
+
+    <script>
+        // Audio Context for generating sounds
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playTone(frequency, duration) {
+            initAudio();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'sine';
+            gainNode.gain.value = 0.1;
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        function playClick() {
+            initAudio();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.frequency.value = 1500;
+            oscillator.type = 'square';
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.05);
+        }
+
+        function playSuccess() {
+            initAudio();
+            const notes = [261.63, 329.63, 392.00]; // C, E, G
+            notes.forEach((freq, i) => {
+                setTimeout(() => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.value = freq;
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                }, i * 100);
+            });
+        }
+
+        function playError() {
+            initAudio();
+            const notes = [329.63, 311.13]; // E, Eb
+            notes.forEach((freq, i) => {
+                setTimeout(() => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.value = freq;
+                    osc.type = 'sawtooth';
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.2);
+                }, i * 100);
+            });
+        }
+
+        function playDrone() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 80;
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 3);
+        }
+
+        function playPing() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 800;
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        }
+
+        function playCountdown() {
+            initAudio();
+            let i = 0;
+            const interval = setInterval(() => {
+                playClick();
+                i++;
+                if (i >= 5) clearInterval(interval);
+            }, 1000 - (i * 150));
+        }
+
+        function playStatic() {
+            initAudio();
+            const bufferSize = audioCtx.sampleRate * 0.2;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+
+            const source = audioCtx.createBufferSource();
+            const gain = audioCtx.createGain();
+            source.buffer = buffer;
+            source.connect(gain);
+            gain.connect(audioCtx.destination);
+            gain.gain.value = 0.1;
+            source.start();
+        }
+
+        function playHeartbeat() {
+            initAudio();
+            const beat = () => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.value = 60;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.15);
+            };
+            beat();
+            setTimeout(beat, 200);
+            setTimeout(beat, 800);
+            setTimeout(beat, 1000);
+        }
+
+        // === HORROR/DARK SOUNDS ===
+
+        function playInfrasound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 18;
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 4);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 4);
+        }
+
+        function playTritone() {
+            initAudio();
+            const freqs = [349.23, 493.88]; // F4 to B4 - tritone
+            freqs.forEach(freq => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.value = freq;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 2);
+            });
+        }
+
+        function playPsychoStrings() {
+            initAudio();
+            // High dissonant cluster like Hitchcock
+            const freqs = [2000, 2100, 2200, 2350, 2500];
+            freqs.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.value = freq;
+                osc.type = 'sawtooth';
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.8);
+            });
+        }
+
+        function playCreepingDrone() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const lfo = audioCtx.createOscillator();
+            const lfoGain = audioCtx.createGain();
+
+            lfo.connect(lfoGain);
+            lfoGain.connect(osc.frequency);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.frequency.setValueAtTime(80, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(200, audioCtx.currentTime + 4);
+            osc.type = 'sawtooth';
+
+            lfo.frequency.value = 3;
+            lfoGain.gain.value = 10;
+
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 4);
+
+            lfo.start();
+            osc.start();
+            osc.stop(audioCtx.currentTime + 4);
+            lfo.stop(audioCtx.currentTime + 4);
+        }
+
+        function playReverseReverb() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 400;
+            osc.type = 'sine';
+            // Reverse envelope - builds up instead of decaying
+            gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.3, audioCtx.currentTime + 1.5);
+            gain.gain.setValueAtTime(0, audioCtx.currentTime + 1.51);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 1.6);
+        }
+
+        function playWhisper() {
+            initAudio();
+            // Multiple detuned frequencies simulating whispers
+            const baseFreq = 200;
+            for (let i = 0; i < 6; i++) {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const filter = audioCtx.createBiquadFilter();
+
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.frequency.value = baseFreq + (Math.random() * 100 - 50);
+                osc.type = 'sawtooth';
+
+                filter.type = 'bandpass';
+                filter.frequency.value = 1000 + Math.random() * 500;
+                filter.Q.value = 10;
+
+                gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.03, audioCtx.currentTime + 2);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3);
+
+                osc.start(audioCtx.currentTime + Math.random() * 0.5);
+                osc.stop(audioCtx.currentTime + 3);
+            }
+        }
+
+        function playMetallicScrape() {
+            initAudio();
+            const bufferSize = audioCtx.sampleRate * 1.5;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+
+            // Generate scraping sound
+            for (let i = 0; i < bufferSize; i++) {
+                const t = i / audioCtx.sampleRate;
+                data[i] = Math.sin(2500 * Math.PI * t + Math.sin(50 * Math.PI * t) * 10) *
+                          Math.sin(3000 * Math.PI * t) *
+                          (Math.random() * 0.3 + 0.7);
+            }
+
+            const source = audioCtx.createBufferSource();
+            const gain = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+
+            source.buffer = buffer;
+            source.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            filter.type = 'highpass';
+            filter.frequency.value = 2000;
+
+            gain.gain.value = 0.15;
+            source.start();
+        }
+
+        function playBreathing() {
+            initAudio();
+            // Simulate breathing with filtered noise
+            const breathIn = () => {
+                const bufferSize = audioCtx.sampleRate * 1.5;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const source = audioCtx.createBufferSource();
+                const gain = audioCtx.createGain();
+                const filter = audioCtx.createBiquadFilter();
+
+                source.buffer = buffer;
+                source.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                filter.type = 'bandpass';
+                filter.frequency.value = 500;
+                filter.Q.value = 2;
+
+                gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.5);
+                gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
+
+                source.start();
+                source.stop(audioCtx.currentTime + 1.5);
+            };
+            breathIn();
+            setTimeout(breathIn, 2000);
+        }
+
+        function playStinger() {
+            initAudio();
+            // Sudden loud dissonant burst
+            const freqs = [150, 160, 170, 300, 310, 600, 620];
+            freqs.forEach(freq => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.value = freq;
+                osc.type = 'sawtooth';
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.5);
+            });
+        }
+
+        function playShepardTone() {
+            initAudio();
+            // Auditory illusion of endlessly descending
+            const duration = 5;
+            for (let i = 0; i < 6; i++) {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const baseFreq = 100 * Math.pow(2, i / 6);
+                osc.frequency.setValueAtTime(baseFreq * 2, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(baseFreq, audioCtx.currentTime + duration);
+                osc.type = 'sine';
+
+                // Bell curve envelope
+                const mid = duration / 2;
+                gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + mid);
+                gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            }
+        }
+
+        function playMusicBox() {
+            initAudio();
+            // Detuned creepy music box melody
+            const notes = [
+                {freq: 523.25, time: 0},      // C5
+                {freq: 587.33, time: 0.4},    // D5 (slightly flat)
+                {freq: 655, time: 0.8},       // E5 (detuned)
+                {freq: 523.25, time: 1.3},    // C5
+                {freq: 490, time: 1.8},       // B4 (very flat - wrong note)
+                {freq: 520, time: 2.4},       // C5 (detuned)
+            ];
+
+            notes.forEach(note => {
+                setTimeout(() => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.value = note.freq;
+                    osc.type = 'triangle';
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.8);
+                }, note.time * 1000);
+            });
+        }
+
+        function playSubharmonic() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 25;
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+
+            // Pulsing
+            const lfo = audioCtx.createOscillator();
+            const lfoGain = audioCtx.createGain();
+            lfo.connect(lfoGain);
+            lfoGain.connect(gain.gain);
+            lfo.frequency.value = 2;
+            lfoGain.gain.value = 0.3;
+
+            lfo.start();
+            osc.start();
+            osc.stop(audioCtx.currentTime + 3);
+            lfo.stop(audioCtx.currentTime + 3);
+        }
+
+        function playDistantThunder() {
+            initAudio();
+            const bufferSize = audioCtx.sampleRate * 4;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+
+            const source = audioCtx.createBufferSource();
+            const gain = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+
+            source.buffer = buffer;
+            source.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            filter.type = 'lowpass';
+            filter.frequency.value = 100;
+
+            gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.5);
+            gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 1);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 4);
+
+            source.start();
+        }
+
+        function playVoid() {
+            initAudio();
+            // Play a tone then cut to silence
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 200;
+            osc.type = 'sine';
+            gain.gain.value = 0.2;
+            osc.start();
+
+            // Sudden cut
+            setTimeout(() => {
+                gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + 0.01);
+            }, 1000);
+        }
+
+        function playBinauralAnxiety() {
+            initAudio();
+            // Requires headphones - creates anxiety through binaural beats
+            const leftOsc = audioCtx.createOscillator();
+            const rightOsc = audioCtx.createOscillator();
+            const leftGain = audioCtx.createGain();
+            const rightGain = audioCtx.createGain();
+            const merger = audioCtx.createChannelMerger(2);
+
+            leftOsc.connect(leftGain);
+            rightOsc.connect(rightGain);
+            leftGain.connect(merger, 0, 0);
+            rightGain.connect(merger, 0, 1);
+            merger.connect(audioCtx.destination);
+
+            leftOsc.frequency.value = 200;
+            rightOsc.frequency.value = 228; // 28Hz difference = beta/anxiety
+            leftOsc.type = 'sine';
+            rightOsc.type = 'sine';
+
+            leftGain.gain.value = 0.15;
+            rightGain.gain.value = 0.15;
+
+            leftOsc.start();
+            rightOsc.start();
+            leftOsc.stop(audioCtx.currentTime + 4);
+            rightOsc.stop(audioCtx.currentTime + 4);
+        }
+
+        // Counter animation demo
+        function animateCounter(el, target) {
+            let current = 0;
+            const increment = target / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    el.textContent = target.toLocaleString();
+                    clearInterval(timer);
+                } else {
+                    el.textContent = Math.floor(current).toLocaleString();
+                }
+            }, 30);
+        }
+
+        // Cipher animation demo
+        const cipherChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const cipherEl = document.getElementById('cipher-demo');
+        let cipherInterval = setInterval(() => {
+            let result = '';
+            for (let i = 0; i < 10; i++) {
+                result += cipherChars[Math.floor(Math.random() * cipherChars.length)];
+            }
+            cipherEl.textContent = result;
+        }, 50);
+
+        setTimeout(() => {
+            clearInterval(cipherInterval);
+            cipherEl.textContent = 'DECRYPTED';
+        }, 3000);
+    </script>
+</body>
+</html>
