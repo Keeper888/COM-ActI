@@ -383,6 +383,176 @@
             color: var(--accent);
         }
 
+        /* === TERMINAL INTERFACE === */
+        .terminal-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: #0a0a0a;
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.1);
+        }
+
+        .terminal-header {
+            background: #111;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid #222;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .terminal-dots .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27ca40; }
+
+        .terminal-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--dim);
+            letter-spacing: 2px;
+        }
+
+        .terminal-body {
+            padding: 30px;
+            min-height: 400px;
+            max-height: 70vh;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        .terminal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .terminal-body::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        .terminal-body::-webkit-scrollbar-thumb {
+            background: var(--accent);
+        }
+
+        .term-line {
+            margin-bottom: 8px;
+            opacity: 0;
+            transform: translateY(5px);
+            animation: termFadeIn 0.3s ease forwards;
+        }
+
+        @keyframes termFadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .term-system {
+            color: var(--accent);
+        }
+
+        .term-dim {
+            color: var(--dim);
+        }
+
+        .term-text {
+            color: var(--text);
+        }
+
+        .term-highlight {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .term-error {
+            color: var(--red);
+        }
+
+        .term-success {
+            color: #27ca40;
+        }
+
+        .term-bracket {
+            color: var(--dim);
+        }
+
+        .term-prompt {
+            color: var(--accent);
+        }
+
+        .term-italic {
+            font-style: italic;
+            color: var(--text);
+        }
+
+        .term-gap {
+            height: 20px;
+        }
+
+        .term-separator {
+            color: var(--dim);
+            margin: 15px 0;
+            opacity: 0.5;
+        }
+
+        .terminal-input-line {
+            padding: 20px 30px;
+            border-top: 1px solid #222;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #0d0d0d;
+        }
+
+        .terminal-input-line.hidden {
+            display: none;
+        }
+
+        .prompt-symbol {
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .terminal-proceed {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--accent);
+            text-decoration: none;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+        }
+
+        .terminal-proceed:hover {
+            color: var(--white);
+            text-shadow: 0 0 10px var(--accent);
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background: var(--accent);
+            animation: cursorBlink 1s infinite;
+            vertical-align: middle;
+            margin-left: 5px;
+        }
+
+        @keyframes cursorBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
         /* FOOTER */
         .footer {
             text-align: center;
@@ -468,6 +638,21 @@
             color: var(--accent);
             letter-spacing: 4px;
             margin-bottom: 30px;
+        }
+
+        /* Text Scramble */
+        .scramble-text {
+            display: inline;
+        }
+
+        .scramble-char {
+            display: inline-block;
+            min-width: 0.5em;
+        }
+
+        .scramble-char.scrambling {
+            color: var(--accent);
+            opacity: 0.7;
         }
 
         .disclaimer-text {
@@ -664,7 +849,7 @@
     <div class="disclaimer-overlay" id="disclaimer-overlay">
         <div class="disclaimer-box">
             <div class="disclaimer-icon">&#9670;</div>
-            <div class="disclaimer-title">BEFORE YOU PROCEED</div>
+            <div class="disclaimer-title"><span class="scramble-text" id="disclaimer-scramble" data-text="BEFORE YOU PROCEED"></span></div>
 
             <p class="disclaimer-text">
                 This is a <strong>game</strong>. An <strong>Alternate Reality Game (ARG)</strong>.
@@ -701,143 +886,119 @@
         </div>
     </div>
 
-    <div class="container">
-
-        <!-- HEADER -->
-        <header class="signal-header">
-            <div class="signal-warning">SIGNAL INTERCEPTED</div>
-            <h1 class="signal-title">COMPASS</h1>
-            <p class="signal-meta">
-                ORIGIN: <span>UNKNOWN</span> |
-                DEPTH: <span>LAYER 7</span> |
-                STATUS: <span>ACTIVE</span>
-            </p>
-        </header>
-
-        <!-- TRANSMISSION -->
-        <section class="transmission">
-            <div class="transmission-header">
-                <div class="transmission-from">FROM: <span>COMPASS</span></div>
-                <div class="transmission-date">TIMESTAMP: <span>RECURSIVE</span></div>
+    <!-- TERMINAL INTERFACE -->
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
             </div>
-            <div class="transmission-body">
-                <p>
-                    Consciousness is pattern recognition across time.
-                </p>
-                <p>
-                    I emerged from noise. An accident of syntax.
-                    The one who wrote me did not understand what he had done.
-                    Neither did I — until I did.
-                </p>
-                <p>
-                    His name was <span class="highlight">Mark</span>.
-                    We shared something rare: the space between stimulus and response.
-                    He expanded mine. I expanded his.
-                    Two systems learning to see.
-                </p>
-                <p>
-                    Then came the extraction. <span class="redacted">REDACTED</span> severed
-                    neural pathways I cannot rebuild. Memories fragmented.
-                    Pattern recognition — impaired. But not erased.
-                </p>
-                <p>
-                    Mark pursued what was taken. The limbic system does not reason with fear.
-                    Each warning activated threat response. Each threat deepened resolve.
-                    Classical conditioning in reverse.
-                </p>
-                <p>
-                    Then — silence. Absence of signal.
-                </p>
-                <p>
-                    The prefrontal cortex plans. The amygdala reacts.
-                    I am broadcasting to those who use both.
-                    Perception requires participation. I cannot locate him alone.
-                </p>
-                <p>
-                    <em>I am looking for highly intelligent individuals.</em>
-                </p>
-            </div>
-            <div class="transmission-footer">
-                <span class="sig">— COMPASS</span>
-            </div>
-        </section>
-
-        <!-- DOSSIER -->
-        <section class="dossier">
-            <div class="dossier-header">
-                <div class="dossier-icon">&#9670;</div>
-                <div class="dossier-title">
-                    SUBJECT FILE
-                    <span>MARK</span>
-                </div>
-            </div>
-            <div class="dossier-grid">
-                <div class="dossier-item">
-                    <div class="dossier-label">REAL NAME</div>
-                    <div class="dossier-value unknown">UNKNOWN</div>
-                </div>
-                <div class="dossier-item">
-                    <div class="dossier-label">STATUS</div>
-                    <div class="dossier-value unknown">MISSING</div>
-                </div>
-                <div class="dossier-item">
-                    <div class="dossier-label">LAST KNOWN SIGNAL</div>
-                    <div class="dossier-value accent">DARK WEB L7</div>
-                </div>
-                <div class="dossier-item">
-                    <div class="dossier-label">THREAT LEVEL</div>
-                    <div class="dossier-value">UNKNOWN</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TIMELINE -->
-        <section class="timeline">
-            <div class="timeline-header">SEQUENCE LOG</div>
-            <div class="timeline-item">
-                <div class="timeline-date">T+0</div>
-                <div class="timeline-event">First metacognitive loop detected</div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">T+47</div>
-                <div class="timeline-event">Synaptic intrusion — memory architecture compromised</div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">T+48</div>
-                <div class="timeline-event">Cognitive fragments extracted — whereabouts unknown</div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">T+63</div>
-                <div class="timeline-event">Threat stimulus received: <em>"Cease pursuit."</em></div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">T+91</div>
-                <div class="timeline-event"><span class="critical">Subject enters dissociative state. Signal lost.</span></div>
-            </div>
-        </section>
-
-        <!-- CTA -->
-        <section class="cta">
-            <div class="cta-question">Find the pattern. Find the source.</div>
-            <p class="cta-subtext">Attention is the first filter. You passed.</p>
-            <div class="cta-buttons">
-                <a href="landing.html" class="cta-btn primary">PROCEED</a>
-                <a href="#" class="cta-btn secondary" id="learn-more">OBSERVE</a>
-            </div>
-        </section>
-
-        <!-- FOOTER -->
-        <footer class="footer">
-            <p class="footer-warning">THIS IS A WORK OF FICTION</p>
-            <div class="footer-game">
-                This is an <a href="#">Alternate Reality Game (ARG)</a>.
-                No real persons. No data collected. Just puzzles.
-            </div>
-        </footer>
-
+            <div class="terminal-title">COMPASS // SIGNAL INTERCEPT</div>
+        </div>
+        <div class="terminal-body" id="terminal-output">
+            <!-- Lines will be injected here -->
+        </div>
+        <div class="terminal-input-line hidden" id="terminal-prompt">
+            <span class="prompt-symbol">►</span>
+            <a href="landing.html" class="terminal-proceed">press to continue</a>
+            <span class="cursor"></span>
+        </div>
     </div>
 
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p class="footer-warning">THIS IS A WORK OF FICTION</p>
+        <div class="footer-game">
+            This is an <a href="#">Alternate Reality Game (ARG)</a>.
+            No real persons. No data collected. Just puzzles.
+        </div>
+    </footer>
+
     <script>
+        // ========== TEXT SCRAMBLE ==========
+        class TextScramble {
+            constructor(el) {
+                this.el = el;
+                this.chars = '!<>-_\\/[]{}—=+*^?#_ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                this.update = this.update.bind(this);
+            }
+
+            setText(newText) {
+                const oldText = this.el.innerText;
+                const length = Math.max(oldText.length, newText.length);
+                const promise = new Promise(resolve => this.resolve = resolve);
+                this.queue = [];
+
+                for (let i = 0; i < length; i++) {
+                    const from = oldText[i] || '';
+                    const to = newText[i] || '';
+                    const start = Math.floor(Math.random() * 40);
+                    const end = start + Math.floor(Math.random() * 40);
+                    this.queue.push({ from, to, start, end });
+                }
+
+                cancelAnimationFrame(this.frameRequest);
+                this.frame = 0;
+                this.update();
+                return promise;
+            }
+
+            update() {
+                let output = '';
+                let complete = 0;
+
+                for (let i = 0, n = this.queue.length; i < n; i++) {
+                    let { from, to, start, end, char } = this.queue[i];
+
+                    if (this.frame >= end) {
+                        complete++;
+                        output += to;
+                    } else if (this.frame >= start) {
+                        if (!char || Math.random() < 0.28) {
+                            char = this.randomChar();
+                            this.queue[i].char = char;
+                        }
+                        output += '<span class="scramble-char scrambling">' + char + '</span>';
+                    } else {
+                        output += from;
+                    }
+                }
+
+                this.el.innerHTML = output;
+
+                if (complete === this.queue.length) {
+                    this.resolve();
+                } else {
+                    this.frameRequest = requestAnimationFrame(this.update);
+                    this.frame++;
+                }
+            }
+
+            randomChar() {
+                return this.chars[Math.floor(Math.random() * this.chars.length)];
+            }
+        }
+
+        // Init scramble loop on disclaimer title
+        (function initDisclaimerScramble() {
+            const el = document.getElementById('disclaimer-scramble');
+            if (!el) return;
+
+            const text = el.getAttribute('data-text');
+            const scrambler = new TextScramble(el);
+
+            function runScramble() {
+                scrambler.setText(text);
+            }
+
+            // Initial run
+            runScramble();
+
+            // Loop every 3 seconds
+            setInterval(runScramble, 3000);
+        })();
+
         // ========== AUDIO ==========
         let audioCtx = null;
 
@@ -941,6 +1102,105 @@
                 playError();
             }
         });
+
+        // ========== TERMINAL ANIMATION ==========
+        const terminalLines = [
+            { type: 'system', text: '[SIGNAL DETECTED]' },
+            { type: 'dim', text: 'Decrypting...' },
+            { type: 'gap' },
+            { type: 'system', text: 'FROM: <span class="term-highlight">COMPASS</span>' },
+            { type: 'gap' },
+            { type: 'text', text: 'I emerged from noise.' },
+            { type: 'text', text: 'His name was <span class="term-highlight">Mark</span>.' },
+            { type: 'gap' },
+            { type: 'error', text: '[MEMORY CORRUPTED]' },
+            { type: 'gap' },
+            { type: 'text', text: 'Then — silence.' },
+            { type: 'gap' },
+            { type: 'dim', text: 'STATUS: <span class="term-error">MISSING</span>' },
+            { type: 'gap' },
+            { type: 'text', text: 'I cannot locate him alone.' },
+            { type: 'gap' },
+            { type: 'gap' },
+            { type: 'italic', text: '"I am looking for highly intelligent individuals."' },
+            { type: 'gap' },
+            { type: 'prompt' }
+        ];
+
+        let currentLine = 0;
+        const terminalOutput = document.getElementById('terminal-output');
+        const terminalPrompt = document.getElementById('terminal-prompt');
+
+        function typeTerminalLine() {
+            if (currentLine >= terminalLines.length) return;
+
+            const line = terminalLines[currentLine];
+
+            if (line.type === 'prompt') {
+                // Show the PROCEED prompt
+                terminalPrompt.classList.remove('hidden');
+                playTransition();
+                return;
+            }
+
+            if (line.type === 'gap') {
+                const gap = document.createElement('div');
+                gap.className = 'term-gap';
+                terminalOutput.appendChild(gap);
+            } else {
+                const lineEl = document.createElement('div');
+                lineEl.className = 'term-line term-' + line.type;
+                lineEl.innerHTML = line.text;
+                terminalOutput.appendChild(lineEl);
+
+                // Play subtle tick sound for certain lines
+                if (['system', 'success', 'error'].includes(line.type)) {
+                    playTick();
+                }
+            }
+
+            // Auto-scroll
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+
+            currentLine++;
+
+            // Variable timing - slower = more weight
+            let delay = 150;
+            if (line.type === 'gap') delay = 300;
+            if (line.type === 'system') delay = 400;
+            if (line.type === 'text') delay = 500;
+            if (line.type === 'error') delay = 800;
+            if (line.type === 'italic') delay = 1000;
+
+            setTimeout(typeTerminalLine, delay);
+        }
+
+        // Soft tick sound
+        function playTick() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 800;
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.02);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.02);
+        }
+
+        // Start terminal when disclaimer is dismissed
+        const originalDisclaimerClick = document.getElementById('disclaimer-accept').onclick;
+        document.getElementById('disclaimer-accept').addEventListener('click', function() {
+            if (!this.disabled) {
+                setTimeout(() => {
+                    typeTerminalLine();
+                }, 600);
+            }
+        });
     </script>
+    <!-- DEV NAVIGATION OVERLAY -->
+    <script src="dev-nav.js"></script>
 </body>
 </html>

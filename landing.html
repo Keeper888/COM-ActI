@@ -2190,6 +2190,7 @@
     <div id="phase-briefing" class="phase hidden">
         <div class="briefing-container">
             <div class="briefing-text"><span class="scramble-text" id="briefing-scramble" data-text="Before to proceed, before to judge"></span></div>
+            <div class="briefing-text"><span class="scramble-text" id="briefing-scramble-2" data-text="The path lies in the shadows between knowing and seeking."></span></div>
             <div class="briefing-formula">Apohoria + Noise + Propaganda</div>
             <button class="continue-btn" id="briefing-continue">PROCEED</button>
         </div>
@@ -2938,23 +2939,33 @@
 
         // === PHASE: APOHORIA BRIEFING ===
         let briefingScrambleInterval = null;
+        let briefingScrambleInterval2 = null;
 
         function startBriefingScramble() {
             const el = document.getElementById('briefing-scramble');
+            const el2 = document.getElementById('briefing-scramble-2');
             const text = el.getAttribute('data-text');
+            const text2 = el2.getAttribute('data-text');
             const scrambler = new TextScramble(el);
+            const scrambler2 = new TextScramble(el2);
 
             // Initial scramble
             scrambler.setText(text);
+            setTimeout(() => scrambler2.setText(text2), 800);
 
-            // Loop every 2 seconds
+            // Loop every 3 seconds
             briefingScrambleInterval = setInterval(() => {
                 scrambler.setText(text);
-            }, 2000);
+            }, 3000);
+
+            briefingScrambleInterval2 = setInterval(() => {
+                scrambler2.setText(text2);
+            }, 3000);
         }
 
         document.getElementById('briefing-continue').addEventListener('click', () => {
             if (briefingScrambleInterval) clearInterval(briefingScrambleInterval);
+            if (briefingScrambleInterval2) clearInterval(briefingScrambleInterval2);
             showPhase('calibration');
             initCalibration();
         });
@@ -3659,5 +3670,7 @@
 
     })();
     </script>
+    <!-- DEV NAVIGATION OVERLAY -->
+    <script src="dev-nav.js"></script>
 </body>
 </html>

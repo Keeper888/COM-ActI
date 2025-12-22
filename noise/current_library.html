@@ -537,6 +537,328 @@
         </div>
     </div>
 
+    <!-- TEXT SCRAMBLE ANIMATION -->
+    <h2>TEXT SCRAMBLE</h2>
+    <p style="font-size: 0.7rem; color: var(--dim); margin-bottom: 20px;">Glitchy text reveal animation - characters scramble randomly before resolving to final text.</p>
+    <div class="scramble-demo-container">
+        <div class="scramble-demo-text">
+            <span class="scramble-text" id="scramble-demo-1" data-text="Before to proceed, before to judge"></span>
+        </div>
+        <div class="scramble-demo-text" style="margin-top: 15px;">
+            <span class="scramble-text" id="scramble-demo-2" data-text="The path lies in the shadows between knowing and seeking."></span>
+        </div>
+        <button class="btn-demo btn-gold" onclick="replayScramble()" style="margin-top: 25px;">REPLAY SCRAMBLE</button>
+    </div>
+
+    <style>
+        /* === TEXT SCRAMBLE === */
+        .scramble-demo-container {
+            background: var(--dark);
+            border: 1px solid var(--gray);
+            padding: 40px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .scramble-demo-text {
+            font-family: 'EB Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--dim);
+            line-height: 1.8;
+        }
+
+        .scramble-text {
+            display: inline;
+        }
+
+        .scramble-char {
+            display: inline-block;
+            min-width: 0.5em;
+        }
+
+        .scramble-char.scrambling {
+            color: var(--accent);
+            opacity: 0.7;
+        }
+    </style>
+
+    <!-- DISCLAIMER OVERLAY (FULL COMPONENT) -->
+    <h2>DISCLAIMER OVERLAY</h2>
+    <p style="font-size: 0.7rem; color: var(--dim); margin-bottom: 20px;">Full "Before You Proceed" screen with checkbox, audio advisory, error shake animation.</p>
+    <button class="btn-demo btn-gold" onclick="showDisclaimerDemo()">SHOW DISCLAIMER OVERLAY</button>
+
+    <!-- The actual overlay (hidden by default) -->
+    <div class="disclaimer-overlay hidden" id="disclaimer-demo-overlay">
+        <div class="disclaimer-box">
+            <div class="disclaimer-icon">&#9670;</div>
+            <div class="disclaimer-title">BEFORE YOU PROCEED</div>
+
+            <p class="disclaimer-text">
+                This is a <strong>game</strong>. An <strong>Alternate Reality Game (ARG)</strong>.
+                Nothing here is real. Treat it as entertainment.
+            </p>
+
+            <ul class="disclaimer-list">
+                <li>Play with friends — it's more fun together</li>
+                <li>Some actions are online, some are offline</li>
+                <li>Offline events mean meeting people from your city</li>
+                <li>Be friendly, be respectful, be safe</li>
+            </ul>
+
+            <p class="disclaimer-footer">
+                No data collected. No login required. Just puzzles.
+            </p>
+
+            <div class="audio-advisory">
+                <svg class="audio-icon-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+                    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3v5z"/>
+                    <path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3v5z"/>
+                </svg>
+                <span class="audio-text">Headphones advised for full experience.</span>
+            </div>
+
+            <label class="checkbox-container" id="demo-checkbox-container">
+                <input type="checkbox" id="demo-checkbox">
+                <span class="checkmark"></span>
+                <span class="checkbox-text">I understand this is a game, not a real mission</span>
+            </label>
+
+            <button class="disclaimer-btn" id="demo-disclaimer-btn" disabled>BEGIN</button>
+        </div>
+    </div>
+
+    <style>
+        /* === DISCLAIMER OVERLAY === */
+        .disclaimer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--black);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .disclaimer-overlay.hidden {
+            display: none;
+        }
+
+        .disclaimer-box {
+            max-width: 550px;
+            text-align: center;
+            padding: 50px 40px;
+            border: 1px solid var(--gray);
+            background: var(--dark);
+        }
+
+        .disclaimer-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 25px;
+        }
+
+        .disclaimer-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent);
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+        }
+
+        .disclaimer-text {
+            font-family: 'EB Garamond', serif;
+            font-size: 1.1rem;
+            color: var(--text);
+            line-height: 1.9;
+            margin-bottom: 20px;
+        }
+
+        .disclaimer-text strong {
+            color: var(--accent);
+        }
+
+        .disclaimer-list {
+            text-align: left;
+            margin: 25px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .disclaimer-list li {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--dim);
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray);
+            letter-spacing: 1px;
+        }
+
+        .disclaimer-list li:last-child {
+            border-bottom: none;
+        }
+
+        .disclaimer-list li::before {
+            content: '◆ ';
+            color: var(--accent);
+        }
+
+        .disclaimer-footer {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--dim);
+            margin-top: 30px;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        .disclaimer-btn {
+            padding: 15px 50px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .disclaimer-btn:hover:not(:disabled) {
+            background: var(--accent);
+            color: var(--black);
+        }
+
+        .disclaimer-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Audio Advisory with scan animation */
+        .audio-advisory {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 25px 0 30px;
+            padding: 15px 20px;
+            border: 1px dashed var(--gray);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .audio-advisory::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+            animation: audioScan 3s linear infinite;
+        }
+
+        @keyframes audioScan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .audio-icon-svg {
+            color: var(--accent);
+        }
+
+        .audio-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text);
+            letter-spacing: 1px;
+        }
+
+        .audio-advisory.tap {
+            background: rgba(212, 175, 55, 0.15);
+        }
+
+        /* Checkbox */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            margin: 25px 0;
+            padding: 12px 15px;
+            border: 1px solid var(--gray);
+            transition: border-color 0.3s;
+        }
+
+        .checkbox-container:hover {
+            border-color: var(--dim);
+        }
+
+        .checkbox-container input {
+            display: none;
+        }
+
+        .checkmark {
+            width: 18px;
+            height: 18px;
+            border: 1px solid var(--dim);
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .checkbox-container input:checked ~ .checkmark {
+            border-color: var(--dim);
+            background: var(--white);
+        }
+
+        .checkmark::after {
+            content: '';
+            position: absolute;
+            display: none;
+            left: 5px;
+            top: 1px;
+            width: 5px;
+            height: 10px;
+            border: solid var(--black);
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .checkbox-container input:checked ~ .checkmark::after {
+            display: block;
+        }
+
+        .checkbox-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--white);
+            letter-spacing: 0.5px;
+        }
+
+        /* Error shake animation */
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+        }
+
+        .checkbox-container.error {
+            animation: errorShake 0.4s ease;
+            border-color: var(--red);
+        }
+
+        .checkbox-container.error .checkbox-text {
+            color: var(--red);
+        }
+    </style>
+
     <!-- FOLDER STRUCTURE -->
     <h2>FOLDER MAP</h2>
     <div class="folder-map">
@@ -691,6 +1013,168 @@
                 osc.stop(audioCtx.currentTime + delay + 0.4);
             });
         }
+
+        // Error sound for disclaimer
+        function playError() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 150;
+            osc.type = 'sawtooth';
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.25);
+        }
+
+        // Double tap sound + flash for BEGIN
+        function doubleTap() {
+            const advisory = document.querySelector('.audio-advisory');
+            playTransition();
+            advisory.classList.add('tap');
+            setTimeout(() => advisory.classList.remove('tap'), 100);
+            setTimeout(() => {
+                playTransition();
+                advisory.classList.add('tap');
+                setTimeout(() => advisory.classList.remove('tap'), 100);
+            }, 250);
+        }
+
+        // === DISCLAIMER DEMO ===
+        function showDisclaimerDemo() {
+            const overlay = document.getElementById('disclaimer-demo-overlay');
+            const checkbox = document.getElementById('demo-checkbox');
+            const btn = document.getElementById('demo-disclaimer-btn');
+            const container = document.getElementById('demo-checkbox-container');
+
+            // Reset state
+            checkbox.checked = false;
+            btn.disabled = true;
+            container.classList.remove('error');
+
+            // Show overlay
+            overlay.classList.remove('hidden');
+        }
+
+        // === TEXT SCRAMBLE CLASS ===
+        class TextScramble {
+            constructor(el) {
+                this.el = el;
+                this.chars = '!<>-_\\/[]{}—=+*^?#_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+                this.update = this.update.bind(this);
+            }
+
+            setText(newText) {
+                const oldText = this.el.innerText;
+                const length = Math.max(oldText.length, newText.length);
+                const promise = new Promise(resolve => this.resolve = resolve);
+                this.queue = [];
+
+                for (let i = 0; i < length; i++) {
+                    const from = oldText[i] || '';
+                    const to = newText[i] || '';
+                    const start = Math.floor(Math.random() * 40);
+                    const end = start + Math.floor(Math.random() * 40);
+                    this.queue.push({ from, to, start, end });
+                }
+
+                cancelAnimationFrame(this.frameRequest);
+                this.frame = 0;
+                this.update();
+                return promise;
+            }
+
+            update() {
+                let output = '';
+                let complete = 0;
+
+                for (let i = 0, n = this.queue.length; i < n; i++) {
+                    let { from, to, start, end, char } = this.queue[i];
+
+                    if (this.frame >= end) {
+                        complete++;
+                        output += to;
+                    } else if (this.frame >= start) {
+                        if (!char || Math.random() < 0.28) {
+                            char = this.randomChar();
+                            this.queue[i].char = char;
+                        }
+                        output += '<span class="scramble-char scrambling">' + char + '</span>';
+                    } else {
+                        output += from;
+                    }
+                }
+
+                this.el.innerHTML = output;
+
+                if (complete === this.queue.length) {
+                    this.resolve();
+                } else {
+                    this.frameRequest = requestAnimationFrame(this.update);
+                    this.frame++;
+                }
+            }
+
+            randomChar() {
+                return this.chars[Math.floor(Math.random() * this.chars.length)];
+            }
+        }
+
+        // Initialize scramble on page load
+        function initScrambleDemo() {
+            const el1 = document.getElementById('scramble-demo-1');
+            const el2 = document.getElementById('scramble-demo-2');
+
+            const scrambler1 = new TextScramble(el1);
+            const scrambler2 = new TextScramble(el2);
+
+            scrambler1.setText(el1.getAttribute('data-text'));
+            setTimeout(() => {
+                scrambler2.setText(el2.getAttribute('data-text'));
+            }, 800);
+        }
+
+        function replayScramble() {
+            const el1 = document.getElementById('scramble-demo-1');
+            const el2 = document.getElementById('scramble-demo-2');
+
+            // Clear text first
+            el1.innerHTML = '';
+            el2.innerHTML = '';
+
+            // Re-run scramble
+            setTimeout(() => initScrambleDemo(), 100);
+        }
+
+        // Auto-init on load
+        document.addEventListener('DOMContentLoaded', initScrambleDemo);
+
+        // Checkbox enables button
+        document.getElementById('demo-checkbox').addEventListener('change', function() {
+            const btn = document.getElementById('demo-disclaimer-btn');
+            const container = document.getElementById('demo-checkbox-container');
+            btn.disabled = !this.checked;
+            container.classList.remove('error');
+        });
+
+        // BEGIN button click
+        document.getElementById('demo-disclaimer-btn').addEventListener('click', function(e) {
+            if (this.disabled) {
+                e.preventDefault();
+                const container = document.getElementById('demo-checkbox-container');
+                container.classList.remove('error');
+                void container.offsetWidth; // Force reflow
+                container.classList.add('error');
+                playError();
+            } else {
+                doubleTap();
+                setTimeout(() => {
+                    document.getElementById('disclaimer-demo-overlay').classList.add('hidden');
+                }, 400);
+            }
+        });
     </script>
 </body>
 </html>
