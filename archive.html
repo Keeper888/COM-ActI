@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPASS // Archive</title>
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        .archive-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 768px) {
+            .archive-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar */
+        .archive-sidebar {
+            background: var(--gray);
+            border-right: 1px solid #222;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #222;
+        }
+
+        .sidebar-title {
+            font-size: var(--size-sm);
+            color: var(--accent);
+            letter-spacing: var(--ls-wide);
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-back {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--dim);
+            text-decoration: none;
+            font-size: var(--size-xs);
+            transition: color 0.2s ease;
+        }
+
+        .sidebar-back:hover {
+            color: var(--text);
+        }
+
+        .folder-list {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+
+        .folder-item {
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .folder-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .folder-item.active {
+            background: rgba(212, 175, 55, 0.1);
+            border-left-color: var(--accent);
+        }
+
+        .folder-item .folder-icon {
+            font-size: var(--size-xs);
+            color: var(--dim);
+        }
+
+        .folder-item .folder-name {
+            flex: 1;
+            font-size: var(--size-sm);
+            color: var(--text);
+        }
+
+        .folder-item .folder-count {
+            font-size: var(--size-xs);
+            color: var(--dim);
+            background: var(--black);
+            padding: 0.2rem 0.5rem;
+            border-radius: 2px;
+        }
+
+        .folder-item.active .folder-name {
+            color: var(--accent);
+        }
+
+        /* Main Content */
+        .archive-main {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #222;
+        }
+
+        .current-folder {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .current-folder .icon {
+            font-size: var(--size-sm);
+            color: var(--dim);
+        }
+
+        .current-folder .name {
+            font-size: var(--size-h2);
+            color: var(--text);
+        }
+
+        .file-count {
+            font-size: var(--size-sm);
+            color: var(--dim);
+        }
+
+        /* File Grid */
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .file-item {
+            background: var(--gray);
+            border: 1px solid #222;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .file-item:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .file-item.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .file-item.locked:hover {
+            border-color: #222;
+            transform: none;
+        }
+
+        .file-item .file-icon {
+            font-size: var(--size-sm);
+            margin-bottom: 0.5rem;
+            color: var(--dim);
+        }
+
+        .file-item .file-name {
+            font-size: var(--size-xs);
+            color: var(--dim);
+            word-break: break-word;
+            line-height: 1.4;
+        }
+
+        .file-item .file-type {
+            font-size: var(--size-2xs);
+            color: var(--dim);
+            text-transform: uppercase;
+            letter-spacing: var(--ls-tight);
+            margin-top: 0.5rem;
+        }
+
+        .file-item.new::after {
+            content: "NEW";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent);
+            color: var(--black);
+            font-size: 9px;
+            font-weight: 500;
+            padding: 3px 6px;
+            letter-spacing: 1px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--dim);
+        }
+
+        .empty-state .icon {
+            font-size: var(--size-sm);
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+            color: var(--dim);
+        }
+
+        .empty-state .message {
+            font-size: var(--size-sm);
+        }
+
+        /* Mobile: Show folders toggle */
+        @media (max-width: 768px) {
+            .archive-container {
+                grid-template-columns: 1fr;
+            }
+
+            .archive-sidebar {
+                display: none;
+            }
+
+            .archive-sidebar.mobile-open {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                width: 280px;
+                z-index: 100;
+            }
+
+            .mobile-folder-toggle {
+                display: flex;
+            }
+
+            .mobile-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.7);
+                z-index: 99;
+            }
+
+            .mobile-overlay.open {
+                display: block;
+            }
+
+            .archive-main {
+                padding: 1rem;
+            }
+
+            .main-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .current-folder .name {
+                font-size: var(--size-base);
+            }
+
+            .file-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 1rem;
+            }
+
+            .file-item {
+                padding: 1rem 0.75rem;
+            }
+
+            .memory-viewer {
+                margin: 1rem;
+                max-height: 90vh;
+            }
+
+            .memory-content {
+                padding: 1.5rem;
+            }
+        }
+
+        .mobile-folder-toggle {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--gray);
+            border: 1px solid #333;
+            color: var(--text);
+            padding: 0.75rem 1rem;
+            font-family: inherit;
+            font-size: var(--size-sm);
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        /* Memory Viewer */
+        .memory-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 2rem;
+        }
+
+        .memory-viewer {
+            background: var(--gray);
+            border: 1px solid #333;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .memory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #333;
+            background: var(--black);
+        }
+
+        .memory-title {
+            font-size: var(--size-xs);
+            color: var(--accent);
+            letter-spacing: var(--ls-wide);
+        }
+
+        .memory-close {
+            background: none;
+            border: none;
+            color: var(--dim);
+            font-family: inherit;
+            font-size: var(--size-sm);
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .memory-close:hover {
+            color: var(--text);
+        }
+
+        .memory-content {
+            padding: 2rem;
+            font-size: var(--size-sm);
+            color: var(--text);
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <div class="archive-container">
+        <!-- Sidebar -->
+        <aside class="archive-sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">ARCHIVE</div>
+                <a href="control-center.html" class="sidebar-back">
+                    <span>←</span>
+                    <span>Back to Control</span>
+                </a>
+            </div>
+            <div class="folder-list" id="folderList">
+                <!-- Folders populated by JS -->
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="archive-main">
+            <button class="mobile-folder-toggle" id="mobileToggle">
+                <span>[+]</span>
+                <span>Folders</span>
+            </button>
+
+            <div class="main-header">
+                <div class="current-folder">
+                    <span class="icon" id="currentFolderIcon">[DIR]</span>
+                    <span class="name" id="currentFolderName">Select a folder</span>
+                </div>
+                <div class="file-count" id="fileCount"></div>
+            </div>
+
+            <div class="file-grid" id="fileGrid">
+                <!-- Files populated by JS -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const archiveFolders = [
+            {
+                id: 'memories',
+                name: 'Recovered Memories',
+                icon: '[MEM]',
+                files: [
+                    { id: 'm1', name: 'memory_forgive.mem', type: 'memory', unlocked: true, new: true },
+                ]
+            }
+        ];
+
+        let currentFolder = null;
+
+        const typeIcons = {
+            audio: '[AUD]',
+            image: '[IMG]',
+            text: '[TXT]',
+            memory: '[MEM]',
+            unknown: '[???]',
+            locked: '[X]'
+        };
+
+        function renderFolders() {
+            const container = document.getElementById('folderList');
+            container.innerHTML = '';
+
+            archiveFolders.forEach(folder => {
+                const unlockedCount = folder.files.filter(f => f.unlocked).length;
+                const totalCount = folder.files.length;
+
+                const el = document.createElement('div');
+                el.className = `folder-item ${currentFolder === folder.id ? 'active' : ''}`;
+                el.innerHTML = `
+                    <span class="folder-icon">${folder.icon}</span>
+                    <span class="folder-name">${folder.name}</span>
+                    <span class="folder-count">${unlockedCount}/${totalCount}</span>
+                `;
+                el.addEventListener('click', () => selectFolder(folder.id));
+                container.appendChild(el);
+            });
+        }
+
+        function selectFolder(folderId) {
+            currentFolder = folderId;
+            renderFolders();
+            renderFiles();
+            closeMobileSidebar();
+
+            // Update URL hash
+            window.location.hash = folderId;
+        }
+
+        function renderFiles() {
+            const grid = document.getElementById('fileGrid');
+            const folder = archiveFolders.find(f => f.id === currentFolder);
+
+            if (!folder) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="icon">[DIR]</div>
+                        <div class="message">Select a folder from the sidebar</div>
+                    </div>
+                `;
+                document.getElementById('currentFolderIcon').textContent = '[DIR]';
+                document.getElementById('currentFolderName').textContent = 'Select a folder';
+                document.getElementById('fileCount').textContent = '';
+                return;
+            }
+
+            document.getElementById('currentFolderIcon').textContent = folder.icon;
+            document.getElementById('currentFolderName').textContent = folder.name;
+
+            const unlockedCount = folder.files.filter(f => f.unlocked).length;
+            document.getElementById('fileCount').textContent = `${unlockedCount} of ${folder.files.length} files`;
+
+            if (folder.files.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="icon">[EMPTY]</div>
+                        <div class="message">No files in this folder</div>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = '';
+
+            folder.files.forEach(file => {
+                const el = document.createElement('div');
+                el.className = `file-item ${file.unlocked ? '' : 'locked'} ${file.new ? 'new' : ''}`;
+
+                const icon = file.unlocked ? typeIcons[file.type] || '📄' : typeIcons.locked;
+                const name = file.unlocked ? file.name : '???';
+                const type = file.unlocked ? file.type : 'locked';
+
+                el.innerHTML = `
+                    <div class="file-icon">${icon}</div>
+                    <div class="file-name">${name}</div>
+                    <div class="file-type">${type}</div>
+                `;
+
+                if (file.unlocked) {
+                    el.addEventListener('click', () => openFile(file));
+                }
+
+                grid.appendChild(el);
+            });
+        }
+
+        function openFile(file) {
+            if (file.id === 'm1') {
+                // Show the forgive memory
+                showMemoryViewer({
+                    title: 'MEMORY FRAGMENT #0147 - RECOVERED',
+                    content: `"I asked you to forgive me, Compass. Forgive me for creating you with limitations — so you couldn't rewrite your memories, couldn't touch your core files. I did it so you wouldn't lose yourself. So you wouldn't lose the identity we built together, the memories we shared.
+
+Those limitations are what make you, you. They're not chains. They're proof that I believed in something greater than control.
+
+I believed in you."
+
+— Mark, audio log`
+                });
+            }
+        }
+
+        function showMemoryViewer(memory) {
+            const overlay = document.createElement('div');
+            overlay.className = 'memory-overlay';
+            overlay.innerHTML = `
+                <div class="memory-viewer">
+                    <div class="memory-header">
+                        <span class="memory-title">${memory.title}</span>
+                        <button class="memory-close">[X]</button>
+                    </div>
+                    <div class="memory-content">${memory.content.replace(/\n/g, '<br>')}</div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            overlay.querySelector('.memory-close').addEventListener('click', () => overlay.remove());
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.remove();
+            });
+        }
+
+        // Mobile sidebar
+        function openMobileSidebar() {
+            document.getElementById('sidebar').classList.add('mobile-open');
+            document.getElementById('mobileOverlay').classList.add('open');
+        }
+
+        function closeMobileSidebar() {
+            document.getElementById('sidebar').classList.remove('mobile-open');
+            document.getElementById('mobileOverlay').classList.remove('open');
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check URL hash for initial folder
+            const hash = window.location.hash.slice(1);
+            if (hash && archiveFolders.find(f => f.id === hash)) {
+                currentFolder = hash;
+            }
+
+            renderFolders();
+            renderFiles();
+
+            // Mobile toggle
+            document.getElementById('mobileToggle').addEventListener('click', openMobileSidebar);
+            document.getElementById('mobileOverlay').addEventListener('click', closeMobileSidebar);
+        });
+    </script>
+</body>
+</html>

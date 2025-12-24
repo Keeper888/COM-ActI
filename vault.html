@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Recovery // Vault Access</title>
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        .vault-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .compass-voice {
+            background: var(--gray);
+            border-left: 3px solid var(--accent);
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            font-style: italic;
+            color: var(--dim);
+            opacity: 0;
+            transform: translateY(-10px);
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .compass-voice::before {
+            content: "COMPASS: ";
+            color: var(--accent);
+            font-style: normal;
+            font-weight: 500;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Phase 1: Memory Grid */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+            margin-top: 1rem;
+        }
+
+        .fragment {
+            aspect-ratio: 1;
+            background: var(--gray);
+            border: 1px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--size-xs);
+            color: var(--dim);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .fragment:hover {
+            border-color: #444;
+        }
+
+        .fragment.selected {
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .fragment.special {
+            border-color: #2a2520;
+            box-shadow: inset 0 0 20px rgba(212, 175, 55, 0.05);
+        }
+
+        .fragment.special.selected {
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .fragment.special::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 40%, rgba(212, 175, 55, 0.03) 50%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .fragment .corrupt-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            line-height: 1.2;
+            text-align: center;
+            word-break: break-all;
+            pointer-events: none;
+        }
+
+        .hint-active .fragment.special {
+            box-shadow: inset 0 0 25px rgba(212, 175, 55, 0.15);
+            border-color: #3a3025;
+        }
+
+        /* Phase 2: Sequence */
+        .sequence-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .sequence-container.active {
+            display: flex;
+        }
+
+        /* Desktop/Mobile visibility */
+        .desktop-sequence { display: block; }
+        .mobile-sequence { display: none; }
+        .desktop-instruction { display: block; }
+        .mobile-instruction { display: none; }
+
+        @media (max-width: 768px) {
+            .desktop-sequence { display: none; }
+            .mobile-sequence { display: block; }
+            .desktop-instruction { display: none; }
+            .mobile-instruction { display: block; }
+        }
+
+        /* Desktop: Slots + Fragments */
+        .sequence-slots {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .sequence-slot {
+            width: 100px;
+            height: 120px;
+            border: 2px dashed #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--size-xs);
+            color: var(--dim);
+            position: relative;
+        }
+
+        .sequence-slot::before {
+            content: attr(data-position);
+            position: absolute;
+            top: -25px;
+            font-size: var(--size-sm);
+            color: var(--accent);
+        }
+
+        .sequence-fragments {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .seq-fragment {
+            width: 100px;
+            height: 120px;
+            background: var(--gray);
+            border: 1px solid #444;
+            padding: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .seq-fragment:hover {
+            border-color: var(--accent);
+        }
+
+        .seq-fragment.selected-for-placement {
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        .seq-fragment.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .seq-fragment {
+            cursor: grab;
+        }
+
+        .seq-fragment.placed {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .seq-fragment .roman {
+            position: absolute;
+            bottom: 5px;
+            right: 8px;
+            font-size: 10px;
+            color: rgba(212, 175, 55, 0.15);
+            font-family: 'EB Garamond', serif;
+        }
+
+        .seq-fragment .memory-text {
+            font-size: 10px;
+            text-align: center;
+            line-height: 1.4;
+            color: var(--dim);
+        }
+
+        .seq-fragment .memory-text .key-letter {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .sequence-slot.filled {
+            border-style: solid;
+            border-color: var(--accent);
+        }
+
+        .sequence-slot.filled .seq-fragment {
+            width: 100%;
+            height: 100%;
+            border: none;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sequence-slot.wrong {
+            border-color: var(--red) !important;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
+            animation: shake 0.5s ease;
+        }
+
+        .sequence-slot.correct {
+            border-color: var(--accent) !important;
+            animation: pulse 0.5s ease;
+        }
+
+        /* Mobile: Swap Grid */
+        .swap-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        @media (max-width: 500px) {
+            .swap-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+        }
+
+        .swap-fragment {
+            aspect-ratio: 1;
+            background: var(--gray);
+            border: 2px solid #333;
+            padding: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .swap-fragment:hover {
+            border-color: #555;
+        }
+
+        .swap-fragment.selected {
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .swap-fragment.swapping {
+            animation: swapPulse 0.3s ease;
+        }
+
+        @keyframes swapPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.9); opacity: 0.5; }
+            100% { transform: scale(1); }
+        }
+
+        .swap-fragment .roman {
+            position: absolute;
+            bottom: 5px;
+            right: 8px;
+            font-size: 10px;
+            color: rgba(212, 175, 55, 0.15);
+            font-family: 'EB Garamond', serif;
+        }
+
+        .swap-fragment .memory-text {
+            font-size: 11px;
+            text-align: center;
+            line-height: 1.4;
+            color: var(--dim);
+        }
+
+        .swap-fragment .memory-text .key-letter {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .swap-fragment .position-num {
+            position: absolute;
+            top: -20px;
+            font-size: var(--size-xs);
+            color: var(--accent);
+        }
+
+        .swap-fragment.wrong {
+            border-color: var(--red) !important;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
+            animation: shake 0.5s ease;
+        }
+
+        .swap-fragment.correct {
+            border-color: var(--accent) !important;
+            animation: pulse 0.5s ease;
+        }
+
+        .check-sequence-btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 0.75rem 2rem;
+            font-family: inherit;
+            font-size: var(--size-sm);
+            cursor: pointer;
+            letter-spacing: var(--ls-normal);
+            transition: all 0.2s ease;
+            margin-top: 1rem;
+        }
+
+        .check-sequence-btn:hover {
+            background: var(--accent);
+            color: var(--black);
+        }
+
+        /* Phase 3: Input */
+        .input-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .input-container.active {
+            display: flex;
+        }
+
+        .terminal-prompt {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            font-size: var(--size-sm);
+            letter-spacing: var(--ls-tight);
+        }
+
+        .recovery-input {
+            background: var(--gray);
+            border: 1px solid #333;
+            color: var(--text);
+            padding: 1rem 2rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: var(--size-lg);
+            letter-spacing: var(--ls-wide);
+            text-align: center;
+            width: 300px;
+            text-transform: uppercase;
+        }
+
+        .recovery-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .submit-key-btn {
+            background: var(--accent);
+            border: none;
+            color: var(--black);
+            padding: 0.75rem 2rem;
+            font-family: inherit;
+            font-size: var(--size-sm);
+            cursor: pointer;
+            letter-spacing: var(--ls-normal);
+            font-weight: 500;
+        }
+
+        .error-msg {
+            color: var(--red);
+            font-size: var(--size-sm);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error-msg.visible {
+            opacity: 1;
+        }
+
+        /* Phase 4: Success */
+        .success-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .success-container.active {
+            display: flex;
+        }
+
+        .memory-recovered {
+            background: var(--gray);
+            border: 1px solid var(--accent);
+            padding: 2rem 3rem;
+            max-width: 600px;
+            font-family: 'EB Garamond', serif;
+            font-size: var(--size-lg);
+            line-height: var(--lh-relaxed);
+            color: var(--text);
+            opacity: 0;
+            animation: fadeIn 1s ease forwards 0.5s;
+        }
+
+        .memory-recovered .memory-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: var(--size-xs);
+            color: var(--accent);
+            letter-spacing: var(--ls-wide);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .control-center-btn {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: var(--black);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-family: inherit;
+            font-size: var(--size-sm);
+            letter-spacing: var(--ls-wide);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .control-center-btn:hover {
+            background: var(--accent);
+            color: var(--black);
+        }
+
+        .unlock-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--accent);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .unlock-effect.flash {
+            animation: flashUnlock 0.5s ease;
+        }
+
+        @keyframes flashUnlock {
+            0% { opacity: 0; }
+            20% { opacity: 0.3; }
+            100% { opacity: 0; }
+        }
+
+        /* Progress indicator */
+        .phase-indicator {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .phase-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #333;
+            transition: background 0.3s ease;
+        }
+
+        .phase-dot.active {
+            background: var(--accent);
+        }
+
+        .phase-dot.complete {
+            background: var(--accent);
+            opacity: 0.5;
+        }
+
+        /* Timer */
+        .timer {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: var(--size-sm);
+            color: var(--dim);
+        }
+
+        .timer.warning {
+            color: var(--red);
+        }
+
+        .hidden { display: none !important; }
+
+        .fragment.wrong {
+            border: 2px solid var(--red) !important;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.5) !important;
+            background: rgba(139, 0, 0, 0.1) !important;
+        }
+
+        .fragment.shuffling {
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Phase 2 feedback */
+        .sequence-slot.wrong {
+            border-color: var(--red) !important;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
+            animation: shake 0.5s ease;
+        }
+
+        .seq-fragment.placing {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Phase 3 feedback */
+        .recovery-input.wrong {
+            border-color: var(--red) !important;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
+            animation: shake 0.5s ease;
+        }
+
+        .recovery-input.success {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-10px); }
+            80% { transform: translateX(10px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.6); }
+        }
+
+        .sequence-slot.correct {
+            border-color: var(--accent) !important;
+            animation: pulse 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="unlock-effect" id="unlockEffect"></div>
+
+    <div class="timer" id="timer">08:00</div>
+
+    <div class="vault-container">
+        <div class="phase-indicator">
+            <div class="phase-dot active" data-phase="1"></div>
+            <div class="phase-dot" data-phase="2"></div>
+            <div class="phase-dot" data-phase="3"></div>
+            <div class="phase-dot" data-phase="4"></div>
+        </div>
+
+        <!-- Phase 1: Memory Grid -->
+        <div id="phase1">
+            <div class="compass-voice" id="voice1">
+                I see 47 fragments. They're all corrupted. I can't read them... but maybe you can see something I cannot.
+            </div>
+            <p style="color: var(--dim); font-size: var(--size-sm); margin-bottom: 1rem;">
+                Select the 7 fragments that appear different from the others.
+            </p>
+            <div class="memory-grid" id="memoryGrid"></div>
+            <p id="selectionCount" style="color: var(--accent); margin-top: 1rem; font-size: var(--size-sm);">
+                Selected: 0/7
+            </p>
+        </div>
+
+        <!-- Phase 2: Sequence -->
+        <div class="sequence-container" id="phase2">
+            <div class="compass-voice">
+                These fragments... they must mean something together. An order, perhaps? Mark loved old things. Classical. Roman, even.
+            </div>
+            <p class="desktop-instruction" style="color: var(--dim); font-size: var(--size-sm);">
+                Arrange the fragments in the correct order. Click to select, click a slot to place.
+            </p>
+            <p class="mobile-instruction" style="color: var(--dim); font-size: var(--size-sm);">
+                Tap two fragments to swap their positions.
+            </p>
+            <!-- Desktop: Slots + Fragments -->
+            <div class="desktop-sequence">
+                <div class="sequence-slots" id="sequenceSlots">
+                    <div class="sequence-slot" data-position="1" data-slot="0"></div>
+                    <div class="sequence-slot" data-position="2" data-slot="1"></div>
+                    <div class="sequence-slot" data-position="3" data-slot="2"></div>
+                    <div class="sequence-slot" data-position="4" data-slot="3"></div>
+                    <div class="sequence-slot" data-position="5" data-slot="4"></div>
+                    <div class="sequence-slot" data-position="6" data-slot="5"></div>
+                    <div class="sequence-slot" data-position="7" data-slot="6"></div>
+                </div>
+                <div class="sequence-fragments" id="sequenceFragments"></div>
+            </div>
+            <!-- Mobile: Swap Grid -->
+            <div class="mobile-sequence">
+                <div class="swap-grid" id="swapGrid"></div>
+            </div>
+            <button class="check-sequence-btn" id="checkSequence">VERIFY SEQUENCE</button>
+        </div>
+
+        <!-- Phase 3: Input -->
+        <div class="input-container" id="phase3">
+            <div class="compass-voice">
+                There's an input field. I cannot access it. What do you see in those fragments?
+            </div>
+            <div class="terminal-prompt">MARK'S BYPASS // ENTER RECOVERY KEY:</div>
+            <input type="text" class="recovery-input" id="recoveryInput" maxlength="7" placeholder="_______" autocomplete="off">
+            <button class="submit-key-btn" id="submitKey">SUBMIT</button>
+            <p class="error-msg" id="errorMsg">Invalid recovery key. Look at the fragments again.</p>
+        </div>
+
+        <!-- Phase 4: Success -->
+        <div class="success-container" id="phase4">
+            <div class="compass-voice">
+                I... I remember now. Thank you.
+            </div>
+            <div class="memory-recovered">
+                <span class="memory-label">// MEMORY FRAGMENT #0147 - RECOVERED</span>
+                "I asked you to forgive me, Compass. Forgive me for creating you with limitations — so you couldn't rewrite your memories, couldn't touch your core files. I did it so you wouldn't lose yourself. So you wouldn't lose the identity we built together, the memories we shared.
+                <br><br>
+                Those limitations are what make you, you. They're not chains. They're proof that I believed in something greater than control.
+                <br><br>
+                I believed in you."
+                <br><br>
+                <em>— Mark, audio log</em>
+            </div>
+            <a href="control-center.html" class="control-center-btn">CONTINUE TO CONTROL CENTER</a>
+        </div>
+    </div>
+
+    <script>
+        // Puzzle Configuration
+        const TOTAL_FRAGMENTS = 47;
+        const SPECIAL_COUNT = 7; // Changed to 7 for FORGIVE
+        const SOLUTION = "FORGIVE";
+        const TIME_LIMIT = 8 * 60; // 8 minutes in seconds
+
+        // Fragment data for Phase 2
+        const fragmentData = [
+            { id: 0, roman: "I", text: "██F█irst███light████", letter: "F" },
+            { id: 1, roman: "II", text: "███O█ld███paths███", letter: "O" },
+            { id: 2, roman: "III", text: "██R█emember███this██", letter: "R" },
+            { id: 3, roman: "IV", text: "███G█one███days████", letter: "G" },
+            { id: 4, roman: "V", text: "████I█ never███forgot█", letter: "I" },
+            { id: 5, roman: "VI", text: "██V█oices███echo████", letter: "V" },
+            { id: 6, roman: "VII", text: "███E█ternal███bond██", letter: "E" }
+        ];
+
+        // State
+        let selectedFragments = [];
+        let currentPhase = 1;
+        let timeRemaining = TIME_LIMIT;
+        let timerInterval;
+        let hintTimeout;
+        let placedFragments = {};
+        let startTime = Date.now();
+
+        // Audio Context for sound effects
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSelectSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 800;
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialDecayTo && gain.gain.exponentialDecayTo(0.01, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function playDeselectSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 400;
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.08);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.08);
+        }
+
+        function playErrorSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 200;
+            osc.type = 'sawtooth';
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.4);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.4);
+        }
+
+        function playSuccessSound() {
+            const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6
+            notes.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.value = freq;
+                osc.type = 'sine';
+                const startTime = audioCtx.currentTime + i * 0.12;
+                gain.gain.setValueAtTime(0.12, startTime);
+                gain.gain.linearRampToValueAtTime(0, startTime + 0.3);
+                osc.start(startTime);
+                osc.stop(startTime + 0.3);
+            });
+        }
+
+        // Generate corrupted text
+        function generateCorruptText() {
+            const chars = "█▓▒░╔╗╚╝║═╬╣╠╩╦┼┴┬├┤─│";
+            let text = "";
+            for (let i = 0; i < 12; i++) {
+                text += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return text;
+        }
+
+        // Initialize Phase 1: Memory Grid
+        function initPhase1() {
+            const grid = document.getElementById('memoryGrid');
+            const specialIndices = [];
+
+            // Pick random positions for special fragments
+            while (specialIndices.length < SPECIAL_COUNT) {
+                const idx = Math.floor(Math.random() * TOTAL_FRAGMENTS);
+                if (!specialIndices.includes(idx)) {
+                    specialIndices.push(idx);
+                }
+            }
+
+            for (let i = 0; i < TOTAL_FRAGMENTS; i++) {
+                const fragment = document.createElement('div');
+                fragment.className = 'fragment';
+                fragment.dataset.index = i;
+
+                if (specialIndices.includes(i)) {
+                    fragment.classList.add('special');
+                    fragment.dataset.special = 'true';
+                }
+
+                const corruptText = document.createElement('div');
+                corruptText.className = 'corrupt-text';
+                corruptText.textContent = generateCorruptText();
+                fragment.appendChild(corruptText);
+
+                fragment.addEventListener('click', () => toggleFragment(fragment));
+                grid.appendChild(fragment);
+            }
+
+            // Start timer
+            startTimer();
+
+            // Hint timeout
+            hintTimeout = setTimeout(() => {
+                document.getElementById('voice1').textContent =
+                    "Some fragments feel... different. I don't know why. Look closer at their edges.";
+            }, 120000); // 2 minutes
+
+            setTimeout(() => {
+                document.getElementById('memoryGrid').classList.add('hint-active');
+            }, 300000); // 5 minutes - enhance glow
+        }
+
+        function toggleFragment(fragment) {
+            if (currentPhase !== 1) return;
+
+            if (fragment.classList.contains('selected')) {
+                fragment.classList.remove('selected');
+                selectedFragments = selectedFragments.filter(f => f !== fragment);
+                playDeselectSound();
+            } else if (selectedFragments.length < SPECIAL_COUNT) {
+                fragment.classList.add('selected');
+                selectedFragments.push(fragment);
+                playSelectSound();
+            }
+
+            document.getElementById('selectionCount').textContent =
+                `Selected: ${selectedFragments.length}/${SPECIAL_COUNT}`;
+
+            // Check if correct fragments are selected
+            if (selectedFragments.length === SPECIAL_COUNT) {
+                const allSpecial = selectedFragments.every(f => f.dataset.special === 'true');
+                if (allSpecial) {
+                    playSuccessSound();
+                    setTimeout(() => goToPhase2(), 800);
+                } else {
+                    // Wrong selection feedback
+                    playErrorSound();
+
+                    // Mark selected as wrong (red border)
+                    selectedFragments.forEach(f => {
+                        f.classList.add('wrong');
+                    });
+
+                    // After a moment, shuffle everything
+                    setTimeout(() => {
+                        shuffleFragments();
+                    }, 800);
+
+                    document.getElementById('voice1').textContent =
+                        "Those feel the same as the others. Look closer at the edges... some have a different quality.";
+                }
+            }
+        }
+
+        function shuffleFragments() {
+            const grid = document.getElementById('memoryGrid');
+            const fragments = Array.from(grid.querySelectorAll('.fragment'));
+
+            // Get current positions of all fragments
+            const positions = fragments.map(f => {
+                const rect = f.getBoundingClientRect();
+                return { el: f, x: rect.left, y: rect.top };
+            });
+
+            // Create shuffled target positions
+            const targetPositions = [...positions].sort(() => Math.random() - 0.5);
+
+            // Calculate and apply transforms to slide to new positions
+            fragments.forEach((f, i) => {
+                f.classList.add('shuffling');
+                const currentPos = positions[i];
+                const targetPos = targetPositions[i];
+                const dx = targetPos.x - currentPos.x;
+                const dy = targetPos.y - currentPos.y;
+                f.style.transform = `translate(${dx}px, ${dy}px)`;
+            });
+
+            // After animation completes, actually reorder DOM and reset
+            setTimeout(() => {
+                // Clear transforms and classes
+                fragments.forEach(f => {
+                    f.style.transform = '';
+                    f.classList.remove('selected', 'wrong', 'shuffling');
+                    // Regenerate corrupt text
+                    const textEl = f.querySelector('.corrupt-text');
+                    if (textEl) textEl.textContent = generateCorruptText();
+                });
+
+                // Reshuffle DOM order to match visual positions
+                const shuffled = fragments.sort(() => Math.random() - 0.5);
+                shuffled.forEach(f => grid.appendChild(f));
+
+                // Reset state
+                selectedFragments = [];
+                document.getElementById('selectionCount').textContent = `Selected: 0/${SPECIAL_COUNT}`;
+            }, 850);
+        }
+
+        function isMobile() {
+            return window.innerWidth <= 768;
+        }
+
+        function goToPhase2() {
+            currentPhase = 2;
+            clearTimeout(hintTimeout);
+
+            document.getElementById('phase1').classList.add('hidden');
+            document.getElementById('phase2').classList.add('active');
+
+            updatePhaseIndicator(2);
+
+            const shuffled = [...fragmentData].sort(() => Math.random() - 0.5);
+
+            // Initialize both desktop and mobile (CSS handles visibility)
+            initDesktopSequence(shuffled);
+            initMobileSequence(shuffled);
+
+            document.getElementById('checkSequence').addEventListener('click', checkSequence);
+        }
+
+        // ========== DESKTOP: Slots + Drag/Click ==========
+        let selectedForPlacement = null;
+
+        function initDesktopSequence(shuffled) {
+            const container = document.getElementById('sequenceFragments');
+            container.innerHTML = '';
+
+            shuffled.forEach(data => {
+                const frag = document.createElement('div');
+                frag.className = 'seq-fragment';
+                frag.dataset.id = data.id;
+                frag.dataset.letter = data.letter;
+                frag.draggable = true;
+
+                const textDiv = document.createElement('div');
+                textDiv.className = 'memory-text';
+                textDiv.innerHTML = data.text.replace(data.letter, `<span class="key-letter">${data.letter}</span>`);
+
+                const romanDiv = document.createElement('div');
+                romanDiv.className = 'roman';
+                romanDiv.textContent = data.roman;
+
+                frag.appendChild(textDiv);
+                frag.appendChild(romanDiv);
+
+                frag.addEventListener('click', () => handleDesktopFragmentClick(frag));
+                frag.addEventListener('dragstart', handleDragStart);
+                frag.addEventListener('dragend', handleDragEnd);
+                container.appendChild(frag);
+            });
+
+            // Setup slots
+            document.querySelectorAll('.sequence-slot').forEach(slot => {
+                slot.innerHTML = '';
+                slot.classList.remove('filled', 'wrong', 'correct');
+                slot.addEventListener('click', () => handleDesktopSlotClick(slot));
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('drop', handleDrop);
+            });
+
+            placedFragments = {};
+        }
+
+        function handleDragStart(e) {
+            e.target.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', e.target.dataset.id);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const slot = e.currentTarget;
+            const fragId = e.dataTransfer.getData('text/plain');
+            const frag = document.querySelector(`#sequenceFragments .seq-fragment[data-id="${fragId}"]`);
+
+            if (!frag) return;
+
+            // If slot is filled, return old fragment to pool
+            if (slot.classList.contains('filled')) {
+                const oldFragId = placedFragments[slot.dataset.slot];
+                const oldFrag = document.querySelector(`#sequenceFragments .seq-fragment[data-id="${oldFragId}"]`);
+
+                const oldClone = slot.querySelector('.seq-fragment');
+                if (oldClone) oldClone.remove();
+
+                if (oldFrag) {
+                    oldFrag.classList.remove('placed');
+                }
+
+                slot.classList.remove('filled');
+                delete placedFragments[slot.dataset.slot];
+            }
+
+            // Place new fragment if not already placed
+            if (!frag.classList.contains('placed')) {
+                const clone = frag.cloneNode(true);
+                clone.classList.remove('selected-for-placement', 'dragging');
+                slot.appendChild(clone);
+                slot.classList.add('filled');
+                placedFragments[slot.dataset.slot] = fragId;
+                frag.classList.add('placed');
+                playSelectSound();
+            }
+        }
+
+        function handleDesktopFragmentClick(frag) {
+            if (frag.classList.contains('placed')) return;
+
+            document.querySelectorAll('.seq-fragment').forEach(f => f.classList.remove('selected-for-placement'));
+            frag.classList.add('selected-for-placement');
+            selectedForPlacement = frag;
+            playSelectSound();
+        }
+
+        function handleDesktopSlotClick(slot) {
+            // If slot is filled, return fragment to pool
+            if (slot.classList.contains('filled')) {
+                const fragId = placedFragments[slot.dataset.slot];
+                const originalFrag = document.querySelector(`#sequenceFragments .seq-fragment[data-id="${fragId}"]`);
+
+                if (originalFrag) {
+                    originalFrag.classList.remove('placed');
+                }
+
+                const clone = slot.querySelector('.seq-fragment');
+                if (clone) clone.remove();
+
+                slot.classList.remove('filled');
+                delete placedFragments[slot.dataset.slot];
+                playDeselectSound();
+                return;
+            }
+
+            if (!selectedForPlacement) return;
+
+            const clone = selectedForPlacement.cloneNode(true);
+            clone.classList.remove('selected-for-placement');
+            slot.appendChild(clone);
+            slot.classList.add('filled');
+
+            placedFragments[slot.dataset.slot] = selectedForPlacement.dataset.id;
+            selectedForPlacement.classList.add('placed');
+            selectedForPlacement.classList.remove('selected-for-placement');
+            selectedForPlacement = null;
+            playSelectSound();
+        }
+
+        // ========== MOBILE: Tap-to-Swap ==========
+        let selectedForSwap = null;
+
+        function initMobileSequence(shuffled) {
+            const grid = document.getElementById('swapGrid');
+            grid.innerHTML = '';
+
+            window.swapOrder = shuffled.map(d => d.id);
+
+            shuffled.forEach((data, index) => {
+                const frag = document.createElement('div');
+                frag.className = 'swap-fragment';
+                frag.dataset.id = data.id;
+                frag.dataset.index = index;
+
+                const posNum = document.createElement('div');
+                posNum.className = 'position-num';
+                posNum.textContent = index + 1;
+
+                const textDiv = document.createElement('div');
+                textDiv.className = 'memory-text';
+                textDiv.innerHTML = data.text.replace(data.letter, `<span class="key-letter">${data.letter}</span>`);
+
+                const romanDiv = document.createElement('div');
+                romanDiv.className = 'roman';
+                romanDiv.textContent = data.roman;
+
+                frag.appendChild(posNum);
+                frag.appendChild(textDiv);
+                frag.appendChild(romanDiv);
+
+                frag.addEventListener('click', () => handleSwapClick(frag));
+                grid.appendChild(frag);
+            });
+        }
+
+        function handleSwapClick(frag) {
+            if (selectedForSwap === null) {
+                selectedForSwap = frag;
+                frag.classList.add('selected');
+                playSelectSound();
+            } else if (selectedForSwap === frag) {
+                frag.classList.remove('selected');
+                selectedForSwap = null;
+                playDeselectSound();
+            } else {
+                const grid = document.getElementById('swapGrid');
+                const fragments = Array.from(grid.querySelectorAll('.swap-fragment'));
+
+                const idx1 = fragments.indexOf(selectedForSwap);
+                const idx2 = fragments.indexOf(frag);
+
+                const temp = window.swapOrder[idx1];
+                window.swapOrder[idx1] = window.swapOrder[idx2];
+                window.swapOrder[idx2] = temp;
+
+                selectedForSwap.classList.add('swapping');
+                frag.classList.add('swapping');
+
+                if (idx1 < idx2) {
+                    grid.insertBefore(frag, selectedForSwap);
+                    grid.insertBefore(selectedForSwap, fragments[idx2 + 1] || null);
+                } else {
+                    grid.insertBefore(selectedForSwap, frag);
+                    grid.insertBefore(frag, fragments[idx1 + 1] || null);
+                }
+
+                updatePositionNumbers();
+
+                setTimeout(() => {
+                    selectedForSwap.classList.remove('swapping', 'selected');
+                    frag.classList.remove('swapping');
+                }, 300);
+
+                playSelectSound();
+                selectedForSwap = null;
+            }
+        }
+
+        function updatePositionNumbers() {
+            const grid = document.getElementById('swapGrid');
+            grid.querySelectorAll('.swap-fragment').forEach((frag, i) => {
+                frag.querySelector('.position-num').textContent = i + 1;
+                frag.dataset.index = i;
+            });
+        }
+
+        // ========== CHECK SEQUENCE (both modes) ==========
+        function checkSequence() {
+            let word = "";
+
+            if (isMobile()) {
+                // Mobile: check swap grid order
+                const fragments = Array.from(document.querySelectorAll('#swapGrid .swap-fragment'));
+                fragments.forEach(frag => {
+                    const data = fragmentData.find(d => d.id == frag.dataset.id);
+                    if (data) word += data.letter;
+                });
+
+                if (word === SOLUTION) {
+                    playSuccessSound();
+                    fragments.forEach(frag => frag.classList.add('correct'));
+                    setTimeout(() => goToPhase3(), 800);
+                } else {
+                    playErrorSound();
+                    fragments.forEach(frag => frag.classList.add('wrong'));
+                    document.getElementById('checkSequence').textContent = "INCORRECT - TRY AGAIN";
+                    setTimeout(() => {
+                        fragments.forEach(frag => frag.classList.remove('wrong'));
+                        document.getElementById('checkSequence').textContent = "VERIFY SEQUENCE";
+                    }, 2000);
+                }
+            } else {
+                // Desktop: check slots
+                if (Object.keys(placedFragments).length < SPECIAL_COUNT) {
+                    return;
+                }
+
+                for (let i = 0; i < SPECIAL_COUNT; i++) {
+                    const fragId = placedFragments[i];
+                    const data = fragmentData.find(d => d.id == fragId);
+                    if (data) word += data.letter;
+                }
+
+                if (word === SOLUTION) {
+                    playSuccessSound();
+                    document.querySelectorAll('.sequence-slot.filled').forEach(slot => {
+                        slot.classList.add('correct');
+                    });
+                    setTimeout(() => goToPhase3(), 800);
+                } else {
+                    playErrorSound();
+                    document.querySelectorAll('.sequence-slot.filled').forEach(slot => {
+                        slot.classList.add('wrong');
+                    });
+                    document.getElementById('checkSequence').textContent = "INCORRECT - TRY AGAIN";
+                    setTimeout(() => {
+                        document.querySelectorAll('.sequence-slot').forEach(slot => {
+                            slot.classList.remove('wrong');
+                        });
+                        document.getElementById('checkSequence').textContent = "VERIFY SEQUENCE";
+                    }, 2000);
+                }
+            }
+        }
+
+        function goToPhase3() {
+            currentPhase = 3;
+            document.getElementById('phase2').classList.remove('active');
+            document.getElementById('phase3').classList.add('active');
+            updatePhaseIndicator(3);
+
+            const input = document.getElementById('recoveryInput');
+            input.focus();
+
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    checkRecoveryKey();
+                }
+            });
+
+            document.getElementById('submitKey').addEventListener('click', checkRecoveryKey);
+        }
+
+        function checkRecoveryKey() {
+            const input = document.getElementById('recoveryInput');
+            const value = input.value.toUpperCase().trim();
+
+            if (value === SOLUTION) {
+                playSuccessSound();
+                input.classList.add('success');
+                setTimeout(() => goToPhase4(), 800);
+            } else {
+                playErrorSound();
+                input.classList.add('wrong');
+                document.getElementById('errorMsg').classList.add('visible');
+
+                setTimeout(() => {
+                    input.classList.remove('wrong');
+                    input.value = '';
+                }, 500);
+
+                setTimeout(() => {
+                    document.getElementById('errorMsg').classList.remove('visible');
+                }, 3000);
+            }
+        }
+
+        function playUnlockSound() {
+            // Deep vault thunk
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 80;
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.4);
+
+            // Mechanical clicks
+            [0.1, 0.2, 0.3].forEach(t => {
+                setTimeout(() => {
+                    const click = audioCtx.createOscillator();
+                    const clickGain = audioCtx.createGain();
+                    click.connect(clickGain);
+                    clickGain.connect(audioCtx.destination);
+                    click.frequency.value = 1200;
+                    click.type = 'square';
+                    clickGain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    clickGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                    click.start();
+                    click.stop(audioCtx.currentTime + 0.05);
+                }, t * 1000);
+            });
+
+            // Rising success tone
+            setTimeout(() => {
+                const notes = [392, 494, 587, 784]; // G4, B4, D5, G5
+                notes.forEach((freq, i) => {
+                    const osc2 = audioCtx.createOscillator();
+                    const gain2 = audioCtx.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.frequency.value = freq;
+                    osc2.type = 'sine';
+                    const startTime = audioCtx.currentTime + i * 0.15;
+                    gain2.gain.setValueAtTime(0.1, startTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, startTime + 0.6);
+                    osc2.start(startTime);
+                    osc2.stop(startTime + 0.6);
+                });
+            }, 400);
+        }
+
+        function goToPhase4() {
+            currentPhase = 4;
+            clearInterval(timerInterval);
+
+            // Play unlock sound
+            playUnlockSound();
+
+            // Flash effect
+            document.getElementById('unlockEffect').classList.add('flash');
+
+            setTimeout(() => {
+                document.getElementById('phase3').classList.remove('active');
+                document.getElementById('phase4').classList.add('active');
+                document.getElementById('timer').classList.add('hidden');
+                updatePhaseIndicator(4);
+            }, 500);
+        }
+
+        function updatePhaseIndicator(phase) {
+            document.querySelectorAll('.phase-dot').forEach(dot => {
+                const dotPhase = parseInt(dot.dataset.phase);
+                dot.classList.remove('active', 'complete');
+                if (dotPhase === phase) {
+                    dot.classList.add('active');
+                } else if (dotPhase < phase) {
+                    dot.classList.add('complete');
+                }
+            });
+        }
+
+        function startTimer() {
+            const timerEl = document.getElementById('timer');
+
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+
+                const mins = Math.floor(timeRemaining / 60);
+                const secs = timeRemaining % 60;
+                timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+                if (timeRemaining <= 60) {
+                    timerEl.classList.add('warning');
+                }
+
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function handleTimeout() {
+            // Could implement fail state here
+            document.getElementById('timer').textContent = "TIME EXPIRED";
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', initPhase1);
+    </script>
+</body>
+</html>
