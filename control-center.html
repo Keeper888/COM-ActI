@@ -197,10 +197,11 @@
             text-transform: uppercase;
         }
 
-        .mission-difficulty.easy { color: #4a9; }
-        .mission-difficulty.medium { color: var(--accent); }
+        .mission-difficulty.easy { color: #ffd700; }
+        .mission-difficulty.medium { color: #ff9800; }
         .mission-difficulty.hard { color: var(--red); }
         .mission-difficulty.unknown { color: #444; }
+        .mission-difficulty.completed { color: #4a9; }
 
         /* Timeline / Next Mission */
         .timeline-panel {
@@ -274,8 +275,19 @@
             background: rgba(212, 175, 55, 0.05);
         }
 
-        .archive-btn .icon {
-            font-size: 1.5rem;
+        .archive-btn.first-visit {
+            animation: pulse-invite 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-invite {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+            }
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            }
         }
 
         .archive-btn .badge {
@@ -438,8 +450,7 @@
                     <div class="panel-header">
                         <span class="panel-title">Archive</span>
                     </div>
-                    <a href="archive.html" class="archive-btn">
-                        <span class="icon">[DIR]</span>
+                    <a href="archive.html" class="archive-btn" id="archiveBtn">
                         <span>Open Archive</span>
                         <span class="badge" id="archiveCount">1</span>
                     </a>
@@ -471,7 +482,8 @@
                 id: 'vault',
                 name: 'First Memory',
                 desc: 'Help Compass recover encrypted memories',
-                difficulty: 'medium',
+                difficulty: 'medium - mission completed',
+                difficultyClass: 'completed',
                 status: 'available',
                 url: 'vault.html'
             },
@@ -517,7 +529,7 @@
                         <div class="mission-name">${mission.name}</div>
                         <div class="mission-desc">${mission.desc}</div>
                     </div>
-                    <div class="mission-difficulty ${mission.difficulty}">${mission.difficulty}</div>
+                    <div class="mission-difficulty ${mission.difficultyClass || mission.difficulty}">${mission.difficulty}</div>
                 `;
 
                 if (mission.status !== 'locked') {
@@ -624,6 +636,20 @@
             });
         }
 
+        // ============ FIRST-TIME ARCHIVE ANIMATION ============
+        function initArchiveAnimation() {
+            const archiveBtn = document.getElementById('archiveBtn');
+            const hasVisited = localStorage.getItem('compass-archive-visited');
+
+            if (!hasVisited) {
+                archiveBtn.classList.add('first-visit');
+
+                archiveBtn.addEventListener('click', () => {
+                    localStorage.setItem('compass-archive-visited', 'true');
+                });
+            }
+        }
+
         // ============ INIT ============
         document.addEventListener('DOMContentLoaded', () => {
             renderMissions();
@@ -631,6 +657,7 @@
             updateDate();
             updateCountdown();
             updateSessionTime();
+            initArchiveAnimation();
 
             setInterval(updateCountdown, 1000);
             setInterval(updateSessionTime, 1000);
